@@ -27,4 +27,4 @@ set(LZC_TEST_SOURCES
 )
 
 add_executable(lzc_test ${LZC_TEST_HEADERS} ${LZC_TEST_SOURCES})
-target_link_libraries(lzc_test gtest lzc)
+target_link_libraries(lzc_test pthread gtest lzc)
