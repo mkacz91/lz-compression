@@ -3,22 +3,23 @@
 #include "../src/dictionary_node.hpp"
 
 TEST(DictionaryNode, InitializesProperly) {
-    DictionaryNode root;
-    EXPECT_EQ(nullptr, root.parent());
-    EXPECT_EQ(0, root.child_cnt());
+    DictionaryNode node1(5);
+    EXPECT_EQ(nullptr, node1.parent());
+    EXPECT_EQ(0, node1.child_cnt());
+    EXPECT_EQ(5, node1.codeword_no());
+    EXPECT_TRUE(node1.is_active());
 
-    DictionaryNode node(5);
-    EXPECT_EQ(nullptr, node.parent());
-    EXPECT_EQ(0, node.child_cnt());
-    // DictionaryNode::codeword_no() will abort when invoked from a root.
-    root.link_child('a', &node);
-    EXPECT_EQ(5, node.codeword_no());
+    DictionaryNode node2(0);
+    EXPECT_EQ(0, node2.codeword_no());
+
+    DictionaryNode node3(-3);
+    EXPECT_EQ(0, node3.codeword_no());
 }
 
 TEST(DictionaryNode, LinksProperly) {
-    DictionaryNode root;
-    DictionaryNode node1;
-    DictionaryNode node2;
+    DictionaryNode root(0);
+    DictionaryNode node1(1);
+    DictionaryNode node2(2);
 
     root.link_child('a', &node1);
     EXPECT_EQ(1, root.child_cnt());
@@ -42,10 +43,10 @@ TEST(DictionaryNode, LinksProperly) {
 }
 
 TEST(DictionaryNode, MaintainsActiveState) {
-    DictionaryNode root;
+    DictionaryNode root(0);
     DictionaryNode node(5);
     root.link_child('a', &node);
-    
+
     EXPECT_TRUE(node.is_active());
     node.deactivate();
     EXPECT_FALSE(node.is_active());

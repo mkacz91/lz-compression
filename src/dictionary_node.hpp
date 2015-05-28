@@ -11,8 +11,8 @@
 class DictionaryNode {
 public:
     // Constructs a node with given codeword number. It is impossible to
-    // alter the codeword number afterwards.
-    explicit DictionaryNode (int codeword_no = -1);
+    // alter the codeword number afterwards. Negative numbers are treated as 0.
+    explicit DictionaryNode (int codeword_no);
 
     // Returns the parent node. The result is `nullptr` in case of root.
     DictionaryNode* parent ();
@@ -35,11 +35,11 @@ public:
     bool is_leaf () const;
 
     // Returns the number of the corresponding codeword. Not valid for inactive
-    // nodes and root nodes.
+    // nodes.
     int codeword_no () const;
 
-    // Returns `true` if the node is active. Root nodes are always cosidered
-    // active. This property is not necessarily used by all dictionary. implementations.
+    // Returns `true` if the node is active. This property is not necessarily
+    // used by all dictionary. implementations.
     bool is_active () const;
 
     // Makes the node inactive. An inactive node cannot be returned to the
@@ -66,7 +66,7 @@ private:
 
 inline DictionaryNode::DictionaryNode (int codeword_no)
     : m_parent(nullptr)
-    , m_codeword_no(codeword_no)
+    , m_codeword_no(max(0, codeword_no))
 {
     // Do nothing
 }
@@ -103,12 +103,11 @@ inline bool DictionaryNode::is_root () const {
 
 inline int DictionaryNode::codeword_no () const {
     assert(this->is_active());
-    assert(!this->is_root());
     return m_codeword_no;
 }
 
 inline bool DictionaryNode::is_active () const {
-    return m_codeword_no != -1 || this->is_root();
+    return m_codeword_no != -1;
 }
 
 inline void DictionaryNode::deactivate () {
