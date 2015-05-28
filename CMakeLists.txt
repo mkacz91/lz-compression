@@ -7,11 +7,13 @@ project(LZCompression)
 set(LZC_HEADERS
   src/bit_buffer.hpp
   src/dictionary_node.hpp
+  src/mru_pool.hpp
   src/prefix.hpp
 )
 
 set(LZC_SOURCES
   src/bit_buffer.cpp
+  src/mru_pool.cpp
 )
 
 add_library(lzc ${LZC_HEADERS} ${LZC_SOURCES})
@@ -28,6 +30,7 @@ set(LZC_TEST_SOURCES
   test/bit_buffer.cpp
   test/dictionary_node.cpp
   test/main.cpp
+  test/mru_pool.cpp
 )
 
 add_executable(lzc_test ${LZC_TEST_HEADERS} ${LZC_TEST_SOURCES})
