@@ -12,13 +12,12 @@ install:
   - cd cmake
   - wget http://www.cmake.org/files/v3.2/cmake-3.2.2-Linux-x86_64.sh
   - sh cmake-3.2.2-Linux-x86_64.sh --exclude-subdir --skip-license
-  - alias cmake=`pwd`/bin/cmake
   - cd ..
 
   - sudo apt-get install -y libgtest-dev
   - mkdir gtest_build
   - cd gtest_build
-  - cmake /usr/src/gtest
+  - ../cmake/bin/cmake /usr/src/gtest
   - make
   - sudo cp *.a /usr/lib
   - cd ..
@@ -26,6 +25,6 @@ install:
 script:
   - mkdir build
   - cd build
-  - cmake ..
+  - ../cmake/bin/cmake ..
   - make
   - ./lzc_test
