@@ -8,8 +8,15 @@ before_install:
   - sudo apt-get update -qq
 
 install:
-  - sudo apt-get install -y libgtest-dev
   - sudo apt-get install -y cmake
+
+  - sudo apt-get install -y libgtest-dev
+  - mkdir gtest_build
+  - cd gtest_build
+  - cmake /usr/src/gtest
+  - make
+  - sudo cp *.a /usr/lib
+  - cd ..
 
 script:
   - mkdir build
