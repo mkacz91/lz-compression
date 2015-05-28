@@ -38,7 +38,3 @@ int MruPool::get () {
         return i;
     }
 }
-
-inline bool MruPool::is_infinite () const {
-    return m_next != -1;
-}

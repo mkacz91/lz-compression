@@ -28,6 +28,9 @@ public:
     // starting at 0.
     int get ();
 
+    // Returns `true` if this is an infinite pool.
+    bool is_infinite () const;
+
 private:
     typedef std::list<int> IntList;
     typedef std::vector<IntList::iterator> IntListIteratorVector;
@@ -41,9 +44,10 @@ private:
     // The number to be returned during next call to `get()` of an infinite
     // pool. Set to -1 in finite pools.
     int m_next;
-
-    // Returns `true` if this is an infinite pool.
-    bool is_infinite () const;
 };
 
-#endif // MSU_POOL_HPP
+inline bool MruPool::is_infinite () const {
+    return m_next != -1;
+}
+
+#endif // MRU_POOL_HPP

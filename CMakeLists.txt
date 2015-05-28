@@ -9,11 +9,13 @@ set(LZC_HEADERS
   src/dictionary_node.hpp
   src/mru_pool.hpp
   src/prefix.hpp
+  src/trie_dictionary.hpp
 )
 
 set(LZC_SOURCES
   src/bit_buffer.cpp
   src/mru_pool.cpp
+  src/trie_dictionary.cpp
 )
 
 add_library(lzc ${LZC_HEADERS} ${LZC_SOURCES})
@@ -31,6 +33,7 @@ set(LZC_TEST_SOURCES
   test/dictionary_node.cpp
   test/main.cpp
   test/mru_pool.cpp
+  test/trie_dictionary.cpp
 )
 
 add_executable(lzc_test ${LZC_TEST_HEADERS} ${LZC_TEST_SOURCES})
