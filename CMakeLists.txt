@@ -6,6 +6,7 @@ project(LZCompression)
 
 set(LZC_HEADERS
   src/bit_buffer.hpp
+  src/dictionary_node.hpp
   src/prefix.hpp
 )
 
@@ -23,6 +24,7 @@ set(LZC_TEST_HEADERS
 
 set(LZC_TEST_SOURCES
   test/bit_buffer.cpp
+  test/dictionary_node.cpp
   test/main.cpp
 )
 
