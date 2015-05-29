@@ -1,4 +1,5 @@
 #include "trie_dictionary.hpp"
+#include <queue>
 
 TrieDictionary::TrieDictionary(int limit) :
     m_codeword_pool(limit)
@@ -11,6 +12,22 @@ TrieDictionary::TrieDictionary(int limit) :
             m_nodes.emplace_back(i);
     }
     m_node = &m_nodes.front();
+}
+
+TrieDictionary::~TrieDictionary () {
+    if (m_codeword_pool.is_infinite()) {
+        // This is an unlimited dictionary, so the nodes are allocated on heap.
+        std::queue<Node*> nodes;
+        for (auto cn : m_nodes[0])
+            nodes.push(cn.second);
+        while (!nodes.empty()) {
+            Node* n = nodes.front();
+            nodes.pop();
+            for (auto cn : *n)
+                nodes.push(cn.second);
+            delete n;
+        }
+    }
 }
 
 int TrieDictionary::try_char (char a) {

@@ -22,6 +22,8 @@ public:
     // Non-positive `limit` results in an unlimited dictionary.
     TrieDictionary (int limit = 0);
 
+    ~TrieDictionary ();
+
     // Advances the internal state of the automaton, trying to match the
     // the currently matched word extended by another letter `a`.
     //

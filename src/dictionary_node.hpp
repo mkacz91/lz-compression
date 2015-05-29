@@ -10,6 +10,9 @@
 // is mostly the same.
 class DictionaryNode {
 public:
+    typedef std::unordered_map<char, DictionaryNode*> ChildMap;
+    typedef ChildMap::iterator iterator;
+
     // Constructs a node with given codeword number. It is impossible to
     // alter the codeword number afterwards. Negative numbers are treated as 0.
     explicit DictionaryNode (int codeword_no);
@@ -20,6 +23,12 @@ public:
     // Returns the node pointed to by an edge with label starting with `a`.
     // The result is `nullptr` if there is no such edge.
     DictionaryNode* child (char a);
+
+    // Returns the iterator pointing to the first child.
+    iterator begin ();
+
+    // Returns the iterator pointing right past the last child.
+    iterator end ();
 
     // Link a child node along an edge with label starting with `a`. Detaching
     // a child is only possible through linking it to another parent.
@@ -47,7 +56,6 @@ public:
     void deactivate ();
 
 private:
-    typedef std::unordered_map<char, DictionaryNode*> ChildMap;
 
     // The parent node. No parent is indicated with `nullptr`.
     DictionaryNode* m_parent;
@@ -78,6 +86,14 @@ inline DictionaryNode* DictionaryNode::parent () {
 inline DictionaryNode* DictionaryNode::child (char a) {
     ChildMap::iterator it = m_children.find(a);
     return it != m_children.end() ? it->second : nullptr;
+}
+
+inline DictionaryNode::iterator DictionaryNode::begin () {
+    return m_children.begin();
+}
+
+inline DictionaryNode::iterator DictionaryNode::end () {
+    return m_children.end();
 }
 
 inline void DictionaryNode::link_child (char a, DictionaryNode* node) {
