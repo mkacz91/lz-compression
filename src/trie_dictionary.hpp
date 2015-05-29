@@ -38,13 +38,17 @@ public:
     // recently used one.
     int try_char (char a);
 
+    // Returns the number of the currently matched codeword, that may still be
+    // extended.
+    int peek_codeword_no () const;
+
 private:
     typedef DictionaryNode Node;
     typedef std::vector<Node> NodeVector;
 
-    // A pool codeword numbers, maintaining the MRU queue. Please note that it
-    // is 0-based, unlike the codeword numbers associated stored in nodes.
-    // The value 0 is reserved for the root and is not subject to queueing.
+    // A pool of codeword numbers, maintaining the MRU queue. Note that it is
+    // 0-based, unlike the codeword numbers associated stored in nodes. The
+    // value 0 is reserved for the root and is not subject to queueing.
     MruPool m_codeword_pool;
 
     // The node pool. If this dictionary is limited, we allocate all nodes at
@@ -61,5 +65,9 @@ private:
     // an existing node.
     Node* new_node ();
 };
+
+inline int TrieDictionary::peek_codeword_no () const {
+    return m_node->codeword_no();
+}
 
 #endif // TRIE_DICTIONARY_HPP
