@@ -19,6 +19,11 @@ int TrieDictionary::try_char (char a) {
         m_node = next_node;
         return -1;
     } else {
+        // If a codeword is used, all its prefixes are also considered used.
+        // The prefixes have to be marked more recent so that the discarded
+        // codewords are always leaves.
+        for (Node* n = m_node; n->codeword_no() != 0; n = n->parent())
+            m_codeword_pool.use(n->codeword_no() - 1);
         m_node->link_child(a, new_node());
         int i = m_node->codeword_no();
         m_node = &m_nodes.front();
@@ -27,7 +32,6 @@ int TrieDictionary::try_char (char a) {
 }
 
 inline DictionaryNode* TrieDictionary::new_node () {
-    // Note that m_codeword_pool is 0-based. That's the reason for `+ 1`.
     return m_codeword_pool.is_infinite()
         ? new DictionaryNode(m_codeword_pool.get() + 1)
         : &m_nodes[m_codeword_pool.get() + 1];
