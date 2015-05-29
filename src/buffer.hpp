@@ -47,8 +47,11 @@ private:
 // A buffer writer that allows appending individual bits.
 class BufferBitWriter {
 public:
+    // Constructs a bit writer attached to given buffer.
     BufferBitWriter (Buffer& buffer);
 
+    // Appends `bit_count` rightmost bits pf `data` to the buffer. The value
+    // `bit_count` may not exceed `WORD_LENGTH`.
     void put (word data, int bit_cnt);
 
 private:
@@ -61,10 +64,13 @@ private:
 // A buffer reader that allows reading char by char.
 class BufferCharReader {
 public:
+    // Constructs a char reader attached to given buffer.
     BufferCharReader (Buffer const& buffer);
 
+    // Returns the next char from the attached buffer.
     char get ();
 
+    // Returns `true` if there is no more data to read.
     bool eob () const;
 
 private:
@@ -76,10 +82,13 @@ private:
 // A buffer writer that allows writing with char resolution.
 class BufferCharWriter {
 public:
+    // Constructs a char writer attached to given buffer.
     BufferCharWriter (Buffer& buffer);
 
+    // Appends a char to the buffer.
     void put (char data);
 
+    // Appends a string to the buffer.
     void put (string const& data);
 
 private:

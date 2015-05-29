@@ -1,6 +1,7 @@
 #include "buffer.hpp"
 
 word BufferBitReader::get (int bit_cnt) {
+    assert(bit_cnt >= 0);
     assert(bit_cnt <= WORD_LENGTH);
     assert(bit_cnt <= m_left);
 
@@ -16,6 +17,7 @@ word BufferBitReader::get (int bit_cnt) {
 }
 
 void BufferBitWriter::put (word data, int bit_cnt) {
+    assert(bit_cnt >= 0);
     assert(bit_cnt <= WORD_LENGTH);
     assert((data & ~lshift(ONES_MASK, bit_cnt)) == data);
 
