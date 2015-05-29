@@ -5,7 +5,7 @@ project(LZCompression)
 
 
 set(LZC_HEADERS
-  src/bit_buffer.hpp
+  src/buffer.hpp
   src/dictionary_node.hpp
   src/mru_pool.hpp
   src/prefix.hpp
@@ -13,7 +13,7 @@ set(LZC_HEADERS
 )
 
 set(LZC_SOURCES
-  src/bit_buffer.cpp
+  src/buffer.cpp
   src/mru_pool.cpp
   src/trie_dictionary.cpp
 )
@@ -29,7 +29,7 @@ set(LZC_TEST_HEADERS
 )
 
 set(LZC_TEST_SOURCES
-  test/bit_buffer.cpp
+  test/buffer.cpp
   test/dictionary_node.cpp
   test/main.cpp
   test/mru_pool.cpp
