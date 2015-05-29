@@ -18,6 +18,9 @@ word const ONES_MASK = ~NULL_WORD;
 using std::min;
 using std::max;
 
+#include <utility>
+using std::swap;
+
 inline word lshift (word x, int n) {
     if (n >= WORD_LENGTH)
         return NULL_WORD;
@@ -38,6 +41,16 @@ inline word rshift (word x, int n) {
         return x << (-n);
     }
     return x >> n;
+}
+
+inline int ceil_log2 (int n) {
+    int i = 0;
+    int p = 1;
+    while (p < n) {
+        ++i;
+        p *= 2;
+    }
+    return p;
 }
 
 #endif // PREFIX_HPP

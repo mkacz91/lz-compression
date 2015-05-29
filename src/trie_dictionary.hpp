@@ -7,17 +7,20 @@
 #include "dictionary_node.hpp"
 #include "mru_pool.hpp"
 
-// A dictionary for usage in LZ78/LZW factorization, that holds codewords in
-// a trie-like datastructure. It can be limited or unlimited.
+// A dictionary for usage in LZ78/LZW factorization. It holds codewords in
+// a trie-like datastructure. Can be limited or unlimited.
 //
 // In the limited case, the least recently used entries are discarded when
-// needed. This stratedy ensures that only leaves are removed, maintaining the
+// needed. This strategy ensures that only leaves are removed, maintaining the
 // trie property.
 //
-// The dictionary serves as a growing automaton. The only method it exposes is
-// `try_char()` which emits codeword number if the maximum match was found.
+// The dictionary behaves like a growing automaton. The only method it exposes
+// is `try_char()` which emits codeword number whenever the maximum match is
+// found.
 class TrieDictionary {
 public:
+    typedef MruPool CodewordPool;
+
     // Constructs a dictionary with given limit for the number of codewords.
     // Non-positive `limit` results in an unlimited dictionary.
     TrieDictionary (int limit = 0);
@@ -49,7 +52,7 @@ private:
     // A pool of codeword numbers, maintaining the MRU queue. Note that it is
     // 0-based, unlike the codeword numbers associated stored in nodes. The
     // value 0 is reserved for the root and is not subject to queueing.
-    MruPool m_codeword_pool;
+    CodewordPool m_codeword_pool;
 
     // The node pool. If this dictionary is limited, we allocate all nodes at
     // once to assure memory coherence. In an unlimited dictionary, this field

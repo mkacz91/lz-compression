@@ -11,8 +11,12 @@ public:
     // Constructs an empty buffer.
     Buffer ();
 
+    Buffer (Buffer&& buffer);
+
     // Returns number of bits stored in the buffer.
     int size () const;
+
+    bool operator == (Buffer const& buffer) const;
 
 private:
     std::vector<word> m_buffer;
@@ -104,8 +108,18 @@ inline Buffer::Buffer () :
     // Do nothing.
 }
 
+inline Buffer::Buffer (Buffer&& buffer) :
+    m_size(buffer.m_size)
+{
+    swap(m_buffer, buffer.m_buffer);
+}
+
 inline int Buffer::size () const {
     return m_size;
+}
+
+inline bool Buffer::operator == (Buffer const& buffer) const {
+    return m_size == buffer.m_size && m_buffer == buffer.m_buffer;
 }
 
 inline BufferBitReader::BufferBitReader(Buffer const& buffer) :
