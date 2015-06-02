@@ -33,23 +33,25 @@ TrieEncodeDict::~TrieEncodeDict () {
 int TrieEncodeDict::try_char (char a) {
     Node* next_node = m_node->child(a);
     if (next_node != nullptr) {
+        // Still matching. Can possibly be extended.
         m_node = next_node;
         return -1;
     } else {
-        // If a codeword is used, all its prefixes are also considered used.
-        // The prefixes have to be marked more recent so that the discarded
-        // codewords are always leaves.
-        for (Node* n = m_node; n->codeword_no() != 0; n = n->parent())
-            m_codeword_pool.use(n->codeword_no() - 1);
-        m_node->link_child(a, new_node());
+        // Maximal match found. New node has to be added. In an unlimited
+        // dictionary, we just allocate on the heap, but otherwise, we tekae one
+        // from the pool, possibly sacrificing an existing node.
+        if (m_codeword_pool.is_infinite()) {
+            m_node->link_child(a, new Node(m_codeword_pool.get() + 1));
+        } else {
+            // If a codeword is used, all its prefixes are also considered used.
+            // The prefixes have to be marked more recent so that the discarded
+            // codewords are always leaves.
+            for (Node* n = m_node; n->codeword_no() != 0; n = n->parent())
+                m_codeword_pool.use(n->codeword_no() - 1);
+            m_node->link_child(a, &m_nodes[m_codeword_pool.get() + 1]);
+        }
         int i = m_node->codeword_no();
         m_node = &m_nodes.front();
         return i;
     }
-}
-
-inline EncodeDictNode* TrieEncodeDict::new_node () {
-    return m_codeword_pool.is_infinite()
-        ? new EncodeDictNode(m_codeword_pool.get() + 1)
-        : &m_nodes[m_codeword_pool.get() + 1];
 }
