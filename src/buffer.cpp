@@ -43,3 +43,15 @@ void BufferCharWriter::put (string const& data) {
     for (char c : data)
         put(c);
 }
+
+void BufferCharWriter::put (BufferCharSlice const& slice) {
+    int new_pos = m_pos + slice.m_length;
+    m_buffer.resize(new_pos * CHAR_LENGTH / WORD_LENGTH + 1);
+    copy(
+        slice.m_begin,
+        slice.m_begin + slice.m_length,
+        reinterpret_cast<char*>(m_buffer.data()) + m_pos
+    );
+    m_size += slice.m_length * CHAR_LENGTH;
+    m_pos = new_pos;
+}

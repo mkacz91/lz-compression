@@ -26,6 +26,7 @@ private:
     friend class BufferBitWriter;
     friend class BufferCharReader;
     friend class BufferCharWriter;
+    friend class BufferCharSlice;
 };
 
 // A buffer reader that allows reading individual bits.
@@ -83,6 +84,20 @@ private:
     int m_pos;
 };
 
+// A slice of buffer data interpreted with char resolution.
+class BufferCharSlice {
+public:
+    // Constructs a new slice of given length, starting at char with index
+    // `begin` and ending. Providing `length <= 0` results in an empty slice.
+    BufferCharSlice (Buffer const& buffer, int begin, int length);
+
+private:
+    char const* const m_begin;
+    int const m_length;
+
+    friend class BufferCharWriter;
+};
+
 // A buffer writer that allows writing with char resolution.
 class BufferCharWriter {
 public:
@@ -94,6 +109,10 @@ public:
 
     // Appends a string to the buffer.
     void put (string const& data);
+
+    // Appends a buffer slice to the buffer. The slice may come from a different
+    // buffer or it may come from the same buffer.
+    void put (BufferCharSlice const& slice);
 
 private:
     std::vector<word>& m_buffer;
@@ -159,6 +178,19 @@ inline char BufferCharReader::get () {
 
 inline bool BufferCharReader::eob () const {
     return m_pos >= m_size;
+}
+
+inline BufferCharSlice::BufferCharSlice (
+    Buffer const& buffer,
+    int begin,
+    int length
+) :
+    m_begin(reinterpret_cast<char const*>(buffer.m_buffer.data()) + begin),
+    m_length(max(0, length))
+{
+    // Permit only proper ranges.
+    assert(begin < buffer.size() / CHAR_LENGTH);
+    assert(begin + m_length <= buffer.size() / CHAR_LENGTH);
 }
 
 inline BufferCharWriter::BufferCharWriter (Buffer& buffer) :

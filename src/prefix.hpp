@@ -22,6 +22,7 @@ word const ONES_MASK = ~NULL_WORD;
 #include <algorithm>
 using std::min;
 using std::max;
+using std::copy;
 
 #include <utility>
 using std::swap;

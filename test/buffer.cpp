@@ -38,21 +38,31 @@ TEST(Buffer, BitIOWorksCorrectly) {
 }
 
 TEST(Buffer, CharIOWorksCorrectly) {
-    Buffer buffer;
+    Buffer buffer1;
+    Buffer buffer2;
 
-    BufferCharWriter writer1(buffer);
-    writer1.put('a');
-    ASSERT_EQ(1 * CHAR_LENGTH, buffer.size());
-    writer1.put('b');
-    ASSERT_EQ(2 * CHAR_LENGTH, buffer.size());
-    writer1.put("cd");
-    ASSERT_EQ(4 * CHAR_LENGTH, buffer.size());
+    BufferCharWriter writer11(buffer1);
+    writer11.put('a');
+    ASSERT_EQ(1 * CHAR_LENGTH, buffer1.size());
+    writer11.put('b');
+    ASSERT_EQ(2 * CHAR_LENGTH, buffer1.size());
+    writer11.put("cd");
+    ASSERT_EQ(4 * CHAR_LENGTH, buffer1.size());
 
-    BufferCharWriter writer2(buffer);
-    writer2.put('e');
-    ASSERT_EQ(5 * CHAR_LENGTH, buffer.size());
+    BufferCharWriter writer2(buffer2);
+    writer2.put("vwxyz");
 
-    BufferCharReader reader(buffer);
+    BufferCharWriter writer12(buffer1);
+    writer12.put(BufferCharSlice(buffer2, 1, 2));
+    ASSERT_EQ(6 * CHAR_LENGTH, buffer1.size());
+    writer12.put(BufferCharSlice(buffer2, 1, 0));
+    ASSERT_EQ(6 * CHAR_LENGTH, buffer1.size());
+    writer12.put(BufferCharSlice(buffer2, 3, -9));
+    ASSERT_EQ(6 * CHAR_LENGTH, buffer1.size());
+    writer12.put('e');
+    ASSERT_EQ(7 * CHAR_LENGTH, buffer1.size());
+
+    BufferCharReader reader(buffer1);
     ASSERT_FALSE(reader.eob());
     ASSERT_EQ('a', reader.get());
     ASSERT_FALSE(reader.eob());
@@ -61,6 +71,10 @@ TEST(Buffer, CharIOWorksCorrectly) {
     ASSERT_EQ('c', reader.get());
     ASSERT_FALSE(reader.eob());
     ASSERT_EQ('d', reader.get());
+    ASSERT_FALSE(reader.eob());
+    ASSERT_EQ('w', reader.get());
+    ASSERT_FALSE(reader.eob());
+    ASSERT_EQ('x', reader.get());
     ASSERT_FALSE(reader.eob());
     ASSERT_EQ('e', reader.get());
     ASSERT_TRUE(reader.eob());
