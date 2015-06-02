@@ -61,12 +61,6 @@ private:
 
     // Pointer to the current state of the automaton, i.e., the longest match.
     Node* m_node;
-
-    // Returns a new node when a new codeword is to be added. In an unlimited
-    // dictionary, it just allocates a new node on the heap, but in case of
-    // a limited dictionary, it takes a node from the pool, possibly sacrificing
-    // an existing node.
-    Node* new_node ();
 };
 
 inline int TrieEncodeDict::peek_codeword_no () const {
