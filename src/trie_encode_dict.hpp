@@ -1,10 +1,10 @@
-#ifndef TRIE_DICTIONARY_HPP
-#define TRIE_DICTIONARY_HPP
+#ifndef TRIE_ENCODE_DICT_HPP
+#define TRIE_ENCODE_DICT_HPP
 
 #include "prefix.hpp"
 #include <vector>
 
-#include "dictionary_node.hpp"
+#include "encode_dict_node.hpp"
 #include "mru_pool.hpp"
 
 // A dictionary for usage in LZ78/LZW factorization. It holds codewords in
@@ -17,15 +17,15 @@
 // The dictionary behaves like a growing automaton. The only method it exposes
 // is `try_char()` which emits codeword number whenever the maximum match is
 // found.
-class TrieDictionary {
+class TrieEncodeDict {
 public:
     typedef MruPool CodewordPool;
 
     // Constructs a dictionary with given limit for the number of codewords.
     // Non-positive `limit` results in an unlimited dictionary.
-    TrieDictionary (int limit = 0);
+    TrieEncodeDict (int limit = 0);
 
-    ~TrieDictionary ();
+    ~TrieEncodeDict ();
 
     // Advances the internal state of the automaton, trying to match the
     // the currently matched word extended by another letter `a`.
@@ -46,7 +46,7 @@ public:
     int peek_codeword_no () const;
 
 private:
-    typedef DictionaryNode Node;
+    typedef EncodeDictNode Node;
     typedef std::vector<Node> NodeVector;
 
     // A pool of codeword numbers, maintaining the MRU queue. Note that it is
@@ -69,8 +69,8 @@ private:
     Node* new_node ();
 };
 
-inline int TrieDictionary::peek_codeword_no () const {
+inline int TrieEncodeDict::peek_codeword_no () const {
     return m_node->codeword_no();
 }
 
-#endif // TRIE_DICTIONARY_HPP
+#endif // TRIE_ENCODE_DICT_HPP

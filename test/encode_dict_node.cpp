@@ -1,25 +1,25 @@
 #include "prefix.hpp"
 
-#include "../src/dictionary_node.hpp"
+#include "../src/encode_dict_node.hpp"
 
-TEST(DictionaryNode, InitializesProperly) {
-    DictionaryNode node1(5);
+TEST(EncodeDictNode, InitializesProperly) {
+    EncodeDictNode node1(5);
     EXPECT_EQ(nullptr, node1.parent());
     EXPECT_EQ(0, node1.child_cnt());
     EXPECT_EQ(5, node1.codeword_no());
     EXPECT_TRUE(node1.is_active());
 
-    DictionaryNode node2(0);
+    EncodeDictNode node2(0);
     EXPECT_EQ(0, node2.codeword_no());
 
-    DictionaryNode node3(-3);
+    EncodeDictNode node3(-3);
     EXPECT_EQ(0, node3.codeword_no());
 }
 
-TEST(DictionaryNode, LinksProperly) {
-    DictionaryNode root(0);
-    DictionaryNode node1(1);
-    DictionaryNode node2(2);
+TEST(EncodeDictNode, LinksProperly) {
+    EncodeDictNode root(0);
+    EncodeDictNode node1(1);
+    EncodeDictNode node2(2);
 
     root.link_child('a', &node1);
     EXPECT_EQ(1, root.child_cnt());
@@ -42,9 +42,9 @@ TEST(DictionaryNode, LinksProperly) {
     EXPECT_EQ(&node2, node1.child('c'));
 }
 
-TEST(DictionaryNode, MaintainsActiveState) {
-    DictionaryNode root(0);
-    DictionaryNode node(5);
+TEST(EncodeDictNode, MaintainsActiveState) {
+    EncodeDictNode root(0);
+    EncodeDictNode node(5);
     root.link_child('a', &node);
 
     EXPECT_TRUE(node.is_active());

@@ -1,7 +1,7 @@
-#include "trie_dictionary.hpp"
+#include "trie_encode_dict.hpp"
 #include <queue>
 
-TrieDictionary::TrieDictionary(int limit) :
+TrieEncodeDict::TrieEncodeDict(int limit) :
     m_codeword_pool(limit)
 {
     m_nodes.emplace_back(0); // Create root node.
@@ -14,7 +14,7 @@ TrieDictionary::TrieDictionary(int limit) :
     m_node = &m_nodes.front();
 }
 
-TrieDictionary::~TrieDictionary () {
+TrieEncodeDict::~TrieEncodeDict () {
     if (m_codeword_pool.is_infinite()) {
         // This is an unlimited dictionary, so the nodes are allocated on heap.
         std::queue<Node*> nodes;
@@ -30,7 +30,7 @@ TrieDictionary::~TrieDictionary () {
     }
 }
 
-int TrieDictionary::try_char (char a) {
+int TrieEncodeDict::try_char (char a) {
     Node* next_node = m_node->child(a);
     if (next_node != nullptr) {
         m_node = next_node;
@@ -48,8 +48,8 @@ int TrieDictionary::try_char (char a) {
     }
 }
 
-inline DictionaryNode* TrieDictionary::new_node () {
+inline EncodeDictNode* TrieEncodeDict::new_node () {
     return m_codeword_pool.is_infinite()
-        ? new DictionaryNode(m_codeword_pool.get() + 1)
+        ? new EncodeDictNode(m_codeword_pool.get() + 1)
         : &m_nodes[m_codeword_pool.get() + 1];
 }

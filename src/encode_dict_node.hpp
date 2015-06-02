@@ -1,28 +1,30 @@
-#ifndef DICTIONARY_NODE_HPP
-#define DICTIONARY_NODE_HPP
+#ifndef ENCODE_DICT_NODE_HPP
+#define ENCODE_DICT_NODE_HPP
 
 #include "prefix.hpp"
 
 #include <unordered_map>
 
-// A word-tree node for use in LZ78/LZW dictionary implementation. Although
-// different implementations of dictionaries are tried, the node structure
-// is mostly the same.
-class DictionaryNode {
+// A word-tree node for use in LZ78/LZW dictionary implementation during
+// encoding.
+//
+// Although different implementations of dictionaries are tried, the
+// node structure is mostly the same.
+class EncodeDictNode {
 public:
-    typedef std::unordered_map<char, DictionaryNode*> ChildMap;
+    typedef std::unordered_map<char, EncodeDictNode*> ChildMap;
     typedef ChildMap::iterator iterator;
 
     // Constructs a node with given codeword number. It is impossible to
     // alter the codeword number afterwards. Negative numbers are treated as 0.
-    explicit DictionaryNode (int codeword_no);
+    explicit EncodeDictNode (int codeword_no);
 
     // Returns the parent node. The result is `nullptr` in case of root.
-    DictionaryNode* parent ();
+    EncodeDictNode* parent ();
 
     // Returns the node pointed to by an edge with label starting with `a`.
     // The result is `nullptr` if there is no such edge.
-    DictionaryNode* child (char a);
+    EncodeDictNode* child (char a);
 
     // Returns the iterator pointing to the first child.
     iterator begin ();
@@ -32,7 +34,7 @@ public:
 
     // Link a child node along an edge with label starting with `a`. Detaching
     // a child is only possible through linking it to another parent.
-    void link_child (char a, DictionaryNode* node);
+    void link_child (char a, EncodeDictNode* node);
 
     // Gets the number of children.
     int child_cnt () const;
@@ -58,7 +60,7 @@ public:
 private:
 
     // The parent node. No parent is indicated with `nullptr`.
-    DictionaryNode* m_parent;
+    EncodeDictNode* m_parent;
 
     // The letter along which the node is linked to its parent. Undefined for
     // unlinked nodes.
@@ -72,31 +74,31 @@ private:
     int m_codeword_no;
 };
 
-inline DictionaryNode::DictionaryNode (int codeword_no)
+inline EncodeDictNode::EncodeDictNode (int codeword_no)
     : m_parent(nullptr)
     , m_codeword_no(max(0, codeword_no))
 {
     // Do nothing
 }
 
-inline DictionaryNode* DictionaryNode::parent () {
+inline EncodeDictNode* EncodeDictNode::parent () {
     return m_parent;
 }
 
-inline DictionaryNode* DictionaryNode::child (char a) {
+inline EncodeDictNode* EncodeDictNode::child (char a) {
     ChildMap::iterator it = m_children.find(a);
     return it != m_children.end() ? it->second : nullptr;
 }
 
-inline DictionaryNode::iterator DictionaryNode::begin () {
+inline EncodeDictNode::iterator EncodeDictNode::begin () {
     return m_children.begin();
 }
 
-inline DictionaryNode::iterator DictionaryNode::end () {
+inline EncodeDictNode::iterator EncodeDictNode::end () {
     return m_children.end();
 }
 
-inline void DictionaryNode::link_child (char a, DictionaryNode* node) {
+inline void EncodeDictNode::link_child (char a, EncodeDictNode* node) {
     assert(m_children.count(a) == 0);
     if (node->m_parent != nullptr)
         node->m_parent->m_children.erase(node->m_link_char);
@@ -105,30 +107,30 @@ inline void DictionaryNode::link_child (char a, DictionaryNode* node) {
     m_children[a] = node;
 }
 
-inline int DictionaryNode::child_cnt () const {
+inline int EncodeDictNode::child_cnt () const {
     return m_children.size();
 }
 
-inline bool DictionaryNode::is_leaf () const {
+inline bool EncodeDictNode::is_leaf () const {
     return m_children.empty();
 }
 
-inline bool DictionaryNode::is_root () const {
+inline bool EncodeDictNode::is_root () const {
     return m_parent == nullptr;
 }
 
-inline int DictionaryNode::codeword_no () const {
+inline int EncodeDictNode::codeword_no () const {
     assert(this->is_active());
     return m_codeword_no;
 }
 
-inline bool DictionaryNode::is_active () const {
+inline bool EncodeDictNode::is_active () const {
     return m_codeword_no != -1;
 }
 
-inline void DictionaryNode::deactivate () {
+inline void EncodeDictNode::deactivate () {
     assert(!this->is_root());
     m_codeword_no = -1;
 }
 
-#endif // DICTIONARY_NODE_HPP
+#endif // ENCODE_DICT_NODE_HPP
