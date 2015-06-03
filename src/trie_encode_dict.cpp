@@ -49,6 +49,7 @@ int TrieEncodeDict::try_char (char a) {
             for (Node* n = m_node; n->codeword_no() != 0; n = n->parent())
                 m_codeword_pool.use(n->codeword_no() - 1);
             m_node->link_child(a, &m_nodes[m_codeword_pool.get() + 1]);
+            // TODO. What if `m_node == &m_nodes[m_codeword_poolget() + 1]`?
         }
         int i = m_node->codeword_no();
         m_node = &m_nodes.front();
