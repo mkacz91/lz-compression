@@ -26,6 +26,8 @@ using std::copy;
 
 #include <utility>
 using std::swap;
+using std::pair;
+using std::make_pair;
 
 inline word lshift (word x, int n) {
     if (n >= WORD_LENGTH)

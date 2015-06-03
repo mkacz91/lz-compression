@@ -29,7 +29,7 @@ inline Lz78<Dictionary>::Lz78 (int dictionary_limit) :
 
 template <typename Dictionary>
 Buffer Lz78<Dictionary>::encode (Buffer const& input) {
-    Dictionary dict;
+    Dictionary dict(m_dictionary_limit);
     BufferCharReader reader(input);
     Buffer output;
     BufferBitWriter writer(output);

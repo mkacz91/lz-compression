@@ -1,10 +1,10 @@
 #include "prefix.hpp"
 
 #include "../src/lz78.hpp"
-#include "../src/trie_encode_dict.hpp"
+#include "../src/mru_encode_dict.hpp"
 
 TEST(Lz78, InfiniteEncodesProperly) {
-    Lz78<TrieEncodeDict> lz78;
+    Lz78<MruEncodeDict> lz78(100);
 
     Buffer input;
     BufferCharWriter iwriter(input);
