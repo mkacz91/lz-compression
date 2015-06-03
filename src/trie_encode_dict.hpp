@@ -21,7 +21,8 @@ class TrieEncodeDict {
 public:
     typedef MruPool CodewordPool;
 
-    // Constructs a dictionary with given limit for the number of codewords.
+    // Constructs a dictionary with given limit. The limit is an upper bound for
+    // both the number of codewords, and the length of a single codeword.
     // Non-positive `limit` results in an unlimited dictionary.
     TrieEncodeDict (int limit = 0);
 
@@ -38,7 +39,8 @@ public:
     // matching codeword, or 0 for the empty codeword.
     //
     // On success, a new codeword is added; possibly in place of the least
-    // recently used one.
+    // recently used one. If the length of the codeword to be added excedes
+    // the upper bound, the dictionary isn't altered. 
     int try_char (char a);
 
     // Returns the number of the currently matched codeword, that may still be
