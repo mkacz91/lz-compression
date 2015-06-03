@@ -48,11 +48,20 @@ int TrieEncodeDict::try_char (char a) {
             // codewords are always leaves.
             for (Node* n = m_node; n->codeword_no() != 0; n = n->parent())
                 m_codeword_pool.use(n->codeword_no() - 1);
-            m_node->link_child(a, &m_nodes[m_codeword_pool.get() + 1]);
-            // TODO. What if `m_node == &m_nodes[m_codeword_poolget() + 1]`?
+            int i = m_codeword_pool.get();
+            int j = m_node->codeword_no() - 1;
+            // If the new codeword is longer than limit, reject. Such situation // is detected when attempting to simultaneously discard and link to
+            // the same node, meaning that the trie is in fact a single path.
+            if (i != j) {
+                if (j < 0) // append to root
+                    m_codeword_pool.use(i);
+                else
+                    m_codeword_pool.use_before(j, i);
+                m_node->link_child(a, &m_nodes[i + 1]);
+            }
         }
-        int i = m_node->codeword_no();
+        int cw = m_node->codeword_no();
         m_node = &m_nodes.front();
-        return i;
+        return cw;
     }
 }
