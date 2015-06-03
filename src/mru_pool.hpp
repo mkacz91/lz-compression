@@ -18,14 +18,20 @@ public:
     // effect on infinite pools.
     void use (int i);
 
+    // Marks `i` as used before `j`. It is moved within the MRU queue right
+    // after `j`.
+    void use_before (int j, int i);
+
     // Provides a number from range [0, size). If the total number of calls to
     // `get()` does not exceed `size`, the returned value is the smallest
     // number not provided yet. If not, the least recently used number, i.e.,
-    // the last number on the MRU queue, is returned. The returned number is
-    // automatically moved to the front of the MRU queue.
+    // the last number on the MRU queue, is returned.
     //
-    // If the pool is infinite, the results is simply consecitive integers
+    // If the pool is infinite, the results is simply consecutive integers
     // starting at 0.
+    //
+    // In both cases the returned number is considered as **never used**, i.e,
+    // it ends up at the end of the MRU queue.
     int get ();
 
     // Returns `true` if this is an infinite pool.

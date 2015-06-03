@@ -7,15 +7,24 @@ MruPool::MruPool (int size) :
 }
 
 void MruPool::use (int i) {
-    if (this->is_infinite()) {
-        // No queue maintained for infinite pools.
-        assert(i < m_next);
-        return;
-    }
+    // Calling this for an infinite pool is a waste of time.
+    assert(!this->is_infinite());
     assert(i < m_queue.size());
+
     m_queue.erase(m_iters[i]);
     m_queue.push_front(i);
     m_iters[i] = m_queue.begin();
+}
+
+void MruPool::use_before (int j, int i) {
+    // Calling this for an infinite pool is a waste of time.
+    assert(!this->is_infinite());
+    assert(i < m_queue.size());
+    assert(j < m_queue.size());
+
+    m_queue.erase(m_iters[i]);
+    auto it = m_iters[j];
+    m_iters[i] = m_queue.insert(++it, i);
 }
 
 int MruPool::get () {
@@ -25,16 +34,12 @@ int MruPool::get () {
     } else if (m_queue.size() < m_iters.capacity()) {
         // The limit hasn't been reached yet. Return a fresh number.
         int i = m_queue.size();
-        m_queue.push_front(i);
-        m_iters.push_back(m_queue.begin());
+        m_queue.push_back(i);
+        m_iters.push_back(--m_queue.end());
         return i;
     } else {
         // The limit has been reached and and the least recently used number
         // will be utilized.
-        int i = m_queue.back();
-        m_queue.pop_back();
-        m_queue.push_front(i);
-        m_iters[i] = m_queue.begin();
-        return i;
+        return m_queue.back();
     }
 }
