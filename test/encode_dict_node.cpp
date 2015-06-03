@@ -2,7 +2,7 @@
 
 #include "../src/encode_dict_node.hpp"
 
-TEST(EncodeDictNode, InitializesProperly) {
+TEST (EncodeDictNodeTest, Initialization) {
     EncodeDictNode node1(5);
     EXPECT_EQ(nullptr, node1.parent());
     EXPECT_EQ(0, node1.child_cnt());
@@ -16,7 +16,7 @@ TEST(EncodeDictNode, InitializesProperly) {
     EXPECT_EQ(0, node3.codeword_no());
 }
 
-TEST(EncodeDictNode, LinksProperly) {
+TEST (EncodeDictNodeTest, Linking) {
     EncodeDictNode root(0);
     EncodeDictNode node1(1);
     EncodeDictNode node2(2);
@@ -42,7 +42,7 @@ TEST(EncodeDictNode, LinksProperly) {
     EXPECT_EQ(&node2, node1.child('c'));
 }
 
-TEST(EncodeDictNode, MaintainsActiveState) {
+TEST (EncodeDictNodeTest, ActiveState) {
     EncodeDictNode root(0);
     EncodeDictNode node(5);
     root.link_child('a', &node);

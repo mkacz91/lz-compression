@@ -2,7 +2,7 @@
 
 #include "../src/buffer.hpp"
 
-TEST(Buffer, BitIOWorksCorrectly) {
+TEST (BufferTest, BitIO) {
     Buffer buffer;
 
     BufferBitWriter writer1(buffer);
@@ -37,7 +37,7 @@ TEST(Buffer, BitIOWorksCorrectly) {
     ASSERT_TRUE(reader.eob());
 }
 
-TEST(Buffer, CharIOWorksCorrectly) {
+TEST (BufferTest, CharIO) {
     Buffer buffer1;
     Buffer buffer2;
 

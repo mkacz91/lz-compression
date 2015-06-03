@@ -2,7 +2,7 @@
 
 #include "../src/mru_encode_dict.cpp"
 
-TEST(MruDictTest, Encoding) {
+TEST (MruDictTest, Encoding) {
     MruEncodeDict d(3);
     // empty queue
     ASSERT_EQ( 0, d.peek_codeword_no());
