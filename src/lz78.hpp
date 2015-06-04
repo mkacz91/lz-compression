@@ -3,40 +3,21 @@
 
 #include "prefix.hpp"
 
-#include "buffer.hpp"
-#include "codeword.hpp"
+#include "lz.hpp"
 
 // TODO: documentation
 template <typename Dict>
-class Lz78 {
+class Lz78 : public Lz {
 public:
-    // Constructs a new LZ78 encoder/decoder with a dictionary of given limit.
-    // Non-positive `dictionary_limit` results in an unlimited dictionary.
-    Lz78 (int dictionary_limit = 0);
+    using Lz::Lz;
 
-    Buffer encode(Buffer const& input);
+    virtual Buffer encode(Buffer const& input) const override;
 
-    Buffer decode(Buffer const& output);
-
-private:
-    int const m_dictionary_limit;
-    int const m_codeword_no_length;
+    virtual Buffer decode(Buffer const& output) const override;
 };
 
 template <typename Dict>
-inline Lz78<Dict>::Lz78 (int dictionary_limit) :
-    m_dictionary_limit(dictionary_limit),
-    m_codeword_no_length(
-        m_dictionary_limit > 0
-            ? ceil_log2(m_dictionary_limit)
-            : WORD_LENGTH
-    )
-{
-    // Do nothing.
-}
-
-template <typename Dict>
-Buffer Lz78<Dict>::encode (Buffer const& input) {
+Buffer Lz78<Dict>::encode (Buffer const& input) const {
     typename Dict::EncodeDict dict(m_dictionary_limit);
     Buffer output;
     BufferCharReader reader(input);
@@ -58,7 +39,7 @@ Buffer Lz78<Dict>::encode (Buffer const& input) {
 }
 
 template <typename Dict>
-Buffer Lz78<Dict>::decode (Buffer const& output) {
+Buffer Lz78<Dict>::decode (Buffer const& output) const {
     typename Dict::DecodeDict dict(m_dictionary_limit);
     Buffer input;
     BufferCharWriter writer(input);
