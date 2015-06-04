@@ -6,6 +6,7 @@
 #include "buffer.hpp"
 #include "codeword.hpp"
 
+// TODO: documentation
 template <typename Dict>
 class Lz78 {
 public:
@@ -36,7 +37,7 @@ inline Lz78<Dict>::Lz78 (int dictionary_limit) :
 
 template <typename Dict>
 Buffer Lz78<Dict>::encode (Buffer const& input) {
-    Dict dict(m_dictionary_limit);
+    typename Dict::EncodeDict dict(m_dictionary_limit);
     Buffer output;
     BufferCharReader reader(input);
     BufferBitWriter writer(output);

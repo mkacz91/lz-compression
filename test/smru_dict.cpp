@@ -1,9 +1,9 @@
 #include "prefix.hpp"
 
-#include "../src/mru_encode_dict.cpp"
+#include "../src/smru_dict.cpp"
 
-TEST (MruDictTest, Encoding) {
-    MruEncodeDict d(3);
+TEST (SmruDictTest, Encoding) {
+    SmruEncodeDict d(3);
     // empty queue
     ASSERT_EQ( 0, d.peek_codeword_no());
     EXPECT_EQ( 0, d.try_char('a')); // a|
@@ -71,8 +71,8 @@ TEST (MruDictTest, Encoding) {
     ASSERT_EQ( 0, d.peek_codeword_no());
 }
 
-TEST (MruDictTest, Decoding) {
-    MruDecodeDict d(3);
+TEST (SmruDictTest, Decoding) {
+    SmruDecodeDict d(3);
 
     d.add_extension(0, 1); // 1: 1
     d.add_extension(0, 2); // 2: 2, 1: 1

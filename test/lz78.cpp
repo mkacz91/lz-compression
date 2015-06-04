@@ -1,11 +1,11 @@
 #include "prefix.hpp"
 
 #include "../src/lz78.hpp"
-#include "../src/mru_encode_dict.hpp"
+#include "../src/smru_dict.hpp"
 
 class Lz78WithMruDictTest : public testing::Test {
 protected:
-    Lz78<MruEncodeDict> lz78;
+    Lz78<SmruDict> lz78;
     Buffer input;
     Buffer output;
 

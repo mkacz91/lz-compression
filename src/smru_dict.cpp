@@ -1,6 +1,6 @@
-#include "mru_dict.hpp"
+#include "smru_dict.hpp"
 
-MruDict::MruDict (int limit) :
+SmruDictBase::SmruDictBase (int limit) :
     m_limit(limit)
 {
     assert(limit > 0);
@@ -12,7 +12,7 @@ MruDict::MruDict (int limit) :
     m_queue_positions.push_back(m_queue.end());
 }
 
-int MruDict::match (int i) {
+int SmruDictBase::match (int i) {
     assert(0 <= i && i <= m_queue.size());
 
     // If a codeword is used, its prefixes are considered used later. This
@@ -53,5 +53,45 @@ int MruDict::match (int i) {
         return j;
     } else {
         return 0;
+    }
+}
+
+SmruEncodeDict::SmruEncodeDict(int limit) :
+    SmruDictBase(limit)
+{
+    // Initialize node pool. First element is always the root.
+    m_nodes.reserve(limit + 1);
+    m_nodes.emplace_back(0);
+    for (int i = 1; i <= limit; ++i)
+        m_nodes.emplace_back(i);
+
+    // Search starts at root.
+    m_node = &m_nodes.front();
+}
+
+SmruDecodeDict::SmruDecodeDict (int limit) :
+    SmruDictBase(limit),
+    m_codewords(limit + 1, Codeword(0, 0))
+{
+    // Do nothing.
+}
+
+int SmruEncodeDict::try_char (char a) {
+    int i = m_node->codeword_no();
+    Node* next_node = m_node->child(a);
+    if (next_node != nullptr) {
+        // Still matching. Can possibly be extended.
+        m_node = next_node;
+        return -1;
+    } else {
+        // Maximal match found. New node has to be added.
+        int j = this->match(i);
+        // We don't update the dictionary if the new codeword is too long. This
+        // is indicated with `j == 0`
+        if (j != 0)
+            m_node->link_child(a, &m_nodes[j]);
+        // New search starts at root.
+        m_node = &m_nodes.front();
+        return i;
     }
 }

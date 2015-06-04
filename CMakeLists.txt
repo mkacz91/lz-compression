@@ -8,16 +8,13 @@ set(LZC_HEADERS
   src/buffer.hpp
   src/codeword.hpp
   src/lz78.hpp
-  src/mru_dict.hpp
-  src/mru_encode_dict.hpp
-  src/mru_decode_dict.hpp
+  src/smru_dict.hpp
   src/prefix.hpp
 )
 
 set(LZC_SOURCES
   src/buffer.cpp
-  src/mru_dict.cpp
-  src/mru_encode_dict.cpp
+  src/smru_dict.cpp
 )
 
 add_library(lzc ${LZC_HEADERS} ${LZC_SOURCES})
@@ -35,7 +32,7 @@ set(LZC_TEST_SOURCES
   test/encode_dict_node.cpp
   test/lz78.cpp
   test/main.cpp
-  test/mru_dict.cpp
+  test/smru_dict.cpp
 )
 
 add_executable(lzc_test ${LZC_TEST_HEADERS} ${LZC_TEST_SOURCES})
