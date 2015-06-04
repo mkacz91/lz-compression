@@ -58,7 +58,7 @@ inline int ceil_log2 (int n) {
         ++i;
         p *= 2;
     }
-    return p;
+    return i;
 }
 
 #endif // PREFIX_HPP

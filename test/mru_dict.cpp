@@ -70,3 +70,37 @@ TEST (MruDictTest, Encoding) {
     // 1: a, 2: ac, 3: acb
     ASSERT_EQ( 0, d.peek_codeword_no());
 }
+
+TEST (MruDictTest, Decoding) {
+    MruDecodeDict d(3);
+
+    d.add_extension(0, 1); // 1: 1
+    d.add_extension(0, 2); // 2: 2, 1: 1
+    d.add_extension(1, 3); // 1: 1, 3: 3, 2: 2
+
+    ASSERT_EQ(Codeword(0, 0), d.codeword(0));
+    ASSERT_EQ(Codeword(1, 1), d.codeword(1));
+    ASSERT_EQ(Codeword(2, 1), d.codeword(2));
+    ASSERT_EQ(Codeword(3, 2), d.codeword(3));
+
+    d.add_extension(2, 4); // 1: 1, 2: 2, 3: 4
+
+    ASSERT_EQ(Codeword(0, 0), d.codeword(0));
+    ASSERT_EQ(Codeword(1, 1), d.codeword(1));
+    ASSERT_EQ(Codeword(2, 1), d.codeword(2));
+    ASSERT_EQ(Codeword(4, 2), d.codeword(3));
+
+    d.add_extension(3, 5); // 2: 2, 3: 4, 1: 5
+
+    ASSERT_EQ(Codeword(0, 0), d.codeword(0));
+    ASSERT_EQ(Codeword(5, 3), d.codeword(1));
+    ASSERT_EQ(Codeword(2, 1), d.codeword(2));
+    ASSERT_EQ(Codeword(4, 2), d.codeword(3));
+
+    d.add_extension(1, 6); // 2: 2, 3: 4, 1: 5 (rejected)
+
+    ASSERT_EQ(Codeword(0, 0), d.codeword(0));
+    ASSERT_EQ(Codeword(5, 3), d.codeword(1));
+    ASSERT_EQ(Codeword(2, 1), d.codeword(2));
+    ASSERT_EQ(Codeword(4, 2), d.codeword(3));
+}

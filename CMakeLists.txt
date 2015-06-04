@@ -6,9 +6,11 @@ project(LZCompression)
 
 set(LZC_HEADERS
   src/buffer.hpp
+  src/codeword.hpp
   src/lz78.hpp
   src/mru_dict.hpp
   src/mru_encode_dict.hpp
+  src/mru_decode_dict.hpp
   src/prefix.hpp
 )
 
@@ -31,6 +33,7 @@ set(LZC_TEST_HEADERS
 set(LZC_TEST_SOURCES
   test/buffer.cpp
   test/encode_dict_node.cpp
+  test/lz78.cpp
   test/main.cpp
   test/mru_dict.cpp
 )

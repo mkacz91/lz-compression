@@ -6,6 +6,7 @@
 
 #include "encode_dict_node.hpp"
 #include "mru_dict.hpp"
+#include "mru_decode_dict.hpp"
 
 // A limited capacity dictionary for usage in LZ78/LZW **encoding**. The
 // dictionary maintains a limited number of the most recently used (abbr. MRU)
@@ -15,6 +16,8 @@
 // `try_char()` which emits codeword number whenever the maximum match is found.
 class MruEncodeDict : public MruDict {
 public:
+    typedef MruDecodeDict DecodeDict;
+
     // Constructs a dictionary with given limit. The limit is an upper bound for
     // both, the number of codewords and the length of a single codeword.
     MruEncodeDict (int limit);

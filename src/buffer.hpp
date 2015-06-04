@@ -189,7 +189,7 @@ inline BufferCharSlice::BufferCharSlice (
     m_length(max(0, length))
 {
     // Permit only proper ranges.
-    assert(begin < buffer.size() / CHAR_LENGTH);
+    assert(begin < buffer.size() / CHAR_LENGTH || m_length == 0);
     assert(begin + m_length <= buffer.size() / CHAR_LENGTH);
 }
 
