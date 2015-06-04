@@ -3,24 +3,24 @@
 #include "../src/lz78.hpp"
 #include "../src/smru_dict.hpp"
 
-class Lz78WithMruDictTest : public testing::Test {
+class SmruLz78Test : public testing::Test {
 protected:
     Lz78<SmruDict> lz78;
     Buffer input;
     Buffer output;
 
-    Lz78WithMruDictTest ();
+    SmruLz78Test ();
 
     void SetUp () override;
 };
 
-Lz78WithMruDictTest::Lz78WithMruDictTest () :
+SmruLz78Test::SmruLz78Test () :
     lz78(3)
 {
     // Do nothing.
 }
 
-void Lz78WithMruDictTest::SetUp () {
+void SmruLz78Test::SetUp () {
     int const codeword_no_length = 2;
 
     BufferCharWriter iwriter(input);
@@ -40,10 +40,30 @@ void Lz78WithMruDictTest::SetUp () {
     owriter.put( 1 , codeword_no_length); // a|a b|* * *|* *|a b c|a
 }
 
-TEST_F (Lz78WithMruDictTest, Encoding) {
+TEST_F (SmruLz78Test, Encoding) {
     ASSERT_EQ(output, lz78.encode(input));
 }
 
-TEST_F (Lz78WithMruDictTest, Decoding) {
+TEST_F (SmruLz78Test, Decoding) {
     ASSERT_EQ(input, lz78.decode(output));
+}
+
+TEST_F (SmruLz78Test, SomeMoreEncodingAndDecoding) {
+    Lz78<SmruDict> lz78(50);
+
+    Buffer input1;
+    BufferCharWriter writer1(input1);
+    writer1.put(
+        "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec "
+        "interdum cursus venenatis. Proin eget fringilla nulla, ut sagittis "
+        "sem. Pellentesque habitant morbi tristique senectus et netus et "
+        "malesuada fames ac turpis egestas. Nunc ultrices erat sit amet leo "
+        "accumsan congue. Duis faucibus justo felis, vel pulvinar enim tempus "
+        "condimentum. Sed aliquam placerat nisi, vitae posuere eros finibus "
+        "sed. Aenean vestibulum et metus eu congue. Pellentesque nec velit ut "
+        "purus suscipit dapibus. Interdum et malesuada fames ac ante ipsum "
+        "primis in faucibus. Nam eu rhoncus quam. Suspendisse consectetur "
+        "neque turpis, vitae pellentesque quam vulputate sed."
+    );
+    EXPECT_EQ(input1, lz78.decode(lz78.encode(input1)));
 }
