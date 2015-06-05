@@ -5,7 +5,7 @@
 #include <list>
 #include <vector>
 
-#include "codeword.hpp"
+#include "dict_base.hpp"
 #include "encode_dict_node.hpp"
 
 // Base class for the SMRU encode and decode dictionaries for use during LZ78/
@@ -23,15 +23,14 @@
 // Such approach enables us to store the codewords in a trie, which grants
 // efficient storage, match lookup and the overall linear time of the LZ
 // encoding.
-class SmruDictBase {
-public:
-    // Returns the limit.
-    int limit () const;
-
+class SmruDictBase : public DictBase {
 protected:
     // Creates a dictionary with given limit. The limits is the upper bound for
     // both, the number of codewords and the length of a single codeword.
     explicit SmruDictBase (int limit);
+
+    // Implements `DictBase::make_permanent(int)`.
+    virtual void make_permanent (int i);
 
     // This method handles the situation when the longest matching codeword is
     // found. It takes the number `i` of the longest matching codeword. Then it
@@ -57,44 +56,26 @@ private:
 
     // The positions of codewords within the MRU queue.
     std::vector<std::list<int>::iterator> m_queue_positions;
-
-    // The upper bound for the number of codewords.
-    int m_limit;
 };
 
 // The SMRU dictionary specialized for **encoding**.
-//
-// The dictionary behaves like a growing automaton. It exposes a method named
-// `try_char()` which emits codeword number whenever the maximum match is found.
-class SmruEncodeDict : public SmruDictBase {
+class SmruEncodeDict : public SmruDictBase, public EncodeDictBase {
 public:
     // Constructs a dictionary with given limit.
     SmruEncodeDict (int limit);
 
-    // Advances the internal state of the automaton, trying to match the
-    // the currently matched word extended by another letter `a`.
-    //
-    // If there is a match, the result is -1, meaning that a longer match may
-    // exist. Non-negative result indicates success. It means that the word
-    // composed of characters provided after the last successful call to
-    // `try_char()`, excluding the current one, is the longest matching
-    // codeword present in the dictionary. The result is then the number of the
-    // matching codeword, or 0 for the empty codeword.
-    //
-    // On success, a new codeword is added; possibly in place of the least
-    // recently used one. If the length of the codeword to be added excedes
-    // the upper bound, the dictionary isn't altered.
-    int try_char (char a);
+    // Implements `EncodeDictBase::try_char(char)`. If the resulting new
+    // codeword would exceed the maximal length, it is siletly ignored.
+    virtual int try_char (char a);
 
-    // Returns the number of the currently matched codeword, that may still be
-    // extended.
-    int peek_codeword_no () const;
+    // Implements `EncodeDictBase::peek_codeword_no() const`.
+    virtual int peek_codeword_no () const;
 
 private:
     typedef EncodeDictNode Node;
 
     // The node pool. We allocate all nodes at once. The first element is the
-    // the root
+    // the root.
     std::vector<Node> m_nodes;
 
     // Pointer to the current state of the automaton, i.e., the longest match.
@@ -102,20 +83,17 @@ private:
 };
 
 // The SMRU dictionary specialized for **decoding**.
-//
-// TODO: documentation
-class SmruDecodeDict : public SmruDictBase {
+class SmruDecodeDict : public SmruDictBase, public DecodeDictBase {
 public:
     // Constructs a new dictionary with given limit.
     SmruDecodeDict (int limit);
 
-    // Adds new codeword to the dictionary. The new codeword starts at `begin`
-    // and is a one-letter extension of the existing codeword `i`. If the
-    // resulting codeword is longer than the limit, this function has no effect.
-    void add_extension (int i, int begin);
+    // Implements `DecodeDictBase::add_extension(int, int)`. If the resulting
+    // codeword would exceed the maximal length, it is silently ignored.
+    virtual void add_extension (int i, int begin);
 
-    // Returs the `i`th codeword.
-    Codeword const& codeword(int i) const;
+    // Implements `DecodeDictBase::codeword(int)`.
+    virtual Codeword const& codeword(int i) const;
 
 private:
     std::vector<Codeword> m_codewords;
@@ -126,10 +104,6 @@ public:
     typedef SmruEncodeDict EncodeDict;
     typedef SmruDecodeDict DecodeDict;
 };
-
-inline int SmruDictBase::limit () const {
-    return m_limit;
-}
 
 inline int SmruEncodeDict::peek_codeword_no () const {
     return m_node->codeword_no();

@@ -6,7 +6,7 @@ project(LZCompression)
 
 set(LZC_HEADERS
   src/buffer.hpp
-  src/codeword.hpp
+  src/dict_base.hpp
   src/lz.hpp
   src/lz78.hpp
   src/smru_dict.hpp

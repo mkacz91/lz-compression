@@ -4,7 +4,7 @@
 #include "prefix.hpp"
 
 #include "buffer.hpp"
-#include "codeword.hpp"
+#include "dict_base.hpp"
 
 class Lz {
 public:

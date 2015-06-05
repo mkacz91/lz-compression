@@ -1,7 +1,7 @@
 #include "smru_dict.hpp"
 
 SmruDictBase::SmruDictBase (int limit) :
-    m_limit(limit)
+    DictBase(limit)
 {
     assert(limit > 0);
     // The arrays are initiated with dummy entries because we want to have
@@ -9,15 +9,27 @@ SmruDictBase::SmruDictBase (int limit) :
     m_parents.reserve(limit + 1);
     m_queue_positions.reserve(limit + 1);
     m_parents.push_back(0);
+    // Note that this makes the root behave like a permanent codeword.
     m_queue_positions.push_back(m_queue.end());
+}
+
+void SmruDictBase::make_permanent (int i) {
+    // A permanent codeword is recognized with
+    // `m_queue_positions[i] == m_queue.end()`. To ensure further integrity,
+    // all prefixes of `i` must also be marked permanent.
+    for (int j = i; m_queue_positions[j] != m_queue.end(); j = m_parents[j]) {
+        m_queue.erase(m_queue_positions[j]);
+        m_queue_positions[j] = m_queue.end();
+    }
 }
 
 int SmruDictBase::match (int i) {
     assert(0 <= i && i <= m_queue.size());
 
-    // If a codeword is used, its prefixes are considered used later. This
-    // ensures that only the leaf codewords are discarded.
-    for (int j = i; j != 0; j = m_parents[j]) {
+    // If a codeword is used, its prefixes are considered used later. The
+    // traversal stops when a permanent codeword is reached, which is indicated
+    // by `m_queue_positions[j] == m_queue.end()`.
+    for (int j = i; m_queue_positions[j] != m_queue.end(); j = m_parents[j]) {
         m_queue.erase(m_queue_positions[j]);
         m_queue.push_front(j);
         m_queue_positions[j] = m_queue.begin();
