@@ -66,4 +66,9 @@ TEST_F (SmruLz78Test, SomeMoreEncodingAndDecoding) {
         "neque turpis, vitae pellentesque quam vulputate sed."
     );
     EXPECT_EQ(input1, lz78.decode(lz78.encode(input1)));
+
+    Buffer input2;
+    BufferCharWriter writer2(input2);
+    writer2.put('x');
+    EXPECT_EQ(input2, lz78.decode(lz78.encode(input2)));
 }
