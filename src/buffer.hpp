@@ -27,7 +27,11 @@ private:
     friend class BufferCharReader;
     friend class BufferCharWriter;
     friend class BufferCharSlice;
+
+    friend std::ostream& operator << (std::ostream& ostr, Buffer const& buffer);
 };
+
+std::ostream& operator << (std::ostream& ostr, Buffer const& buffer);
 
 // A buffer reader that allows reading individual bits.
 class BufferBitReader {

@@ -1,5 +1,18 @@
 #include "buffer.hpp"
 
+std::ostream& operator << (std::ostream& ostr, Buffer const& buffer) {
+    BufferBitReader reader(buffer);
+    int pos = 0;
+    while (!reader.eob()) {
+        ostr << (reader.get(1) == NULL_WORD ? '0' : '1');
+        if (++pos == 8) {
+            ostr << ' ';
+            pos = 0;
+        }
+    }
+    return ostr;
+}
+
 word BufferBitReader::get (int bit_cnt) {
     assert(bit_cnt >= 0);
     assert(bit_cnt <= WORD_LENGTH);

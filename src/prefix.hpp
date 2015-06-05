@@ -14,11 +14,12 @@ using std::string;
 #include <limits>
 // TODO: Investigate 32 vs 64 bit
 typedef unsigned int uint;
-typedef uint word;
+typedef unsigned long long word;
 int const WORD_LENGTH = std::numeric_limits<word>::digits;
 int const CHAR_LENGTH = 8;
 word const NULL_WORD = 0u;
 word const ONES_MASK = ~NULL_WORD;
+int const CHAR_CNT = 256;
 
 #include <algorithm>
 using std::min;

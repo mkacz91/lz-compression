@@ -9,12 +9,19 @@
 template <typename Dict>
 class Lz78 : public Lz {
 public:
-    Lz78 (int limit) : Lz(limit) {}
+    Lz78 (int dictionary_limit);
 
     virtual Buffer encode(Buffer const& input) const;
 
     virtual Buffer decode(Buffer const& output) const;
 };
+
+template <typename Dict>
+Lz78<Dict>::Lz78 (int dictionary_limit) :
+    Lz(dictionary_limit)
+{
+    // Do nothing.
+}
 
 template <typename Dict>
 Buffer Lz78<Dict>::encode (Buffer const& input) const {
