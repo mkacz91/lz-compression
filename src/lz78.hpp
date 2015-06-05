@@ -9,11 +9,11 @@
 template <typename Dict>
 class Lz78 : public Lz {
 public:
-    using Lz::Lz;
+    Lz78 (int limit) : Lz(limit) {}
 
-    virtual Buffer encode(Buffer const& input) const override;
+    virtual Buffer encode(Buffer const& input) const;
 
-    virtual Buffer decode(Buffer const& output) const override;
+    virtual Buffer decode(Buffer const& output) const;
 };
 
 template <typename Dict>

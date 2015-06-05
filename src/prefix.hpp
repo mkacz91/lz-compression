@@ -12,6 +12,7 @@ using std::endl;
 using std::string;
 
 #include <limits>
+// TODO: Investigate 32 vs 64 bit
 typedef unsigned int uint;
 typedef uint word;
 int const WORD_LENGTH = std::numeric_limits<word>::digits;

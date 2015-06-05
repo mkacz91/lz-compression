@@ -17,6 +17,7 @@ public:
     virtual Buffer decode (Buffer const& output) const = 0;
 
 protected:
+    // TODO: Naming
     int const m_dictionary_limit;
     int const m_codeword_no_length;
 };
