@@ -1,7 +1,7 @@
-#ifndef ENCODE_DICT_NODE_HPP
-#define ENCODE_DICT_NODE_HPP
+#ifndef ENCODE_DICT_NODE_H
+#define ENCODE_DICT_NODE_H
 
-#include "prefix.hpp"
+#include "prefix.h"
 
 #include <unordered_map>
 
@@ -133,4 +133,4 @@ inline void EncodeDictNode::deactivate () {
     m_codeword_no = -1;
 }
 
-#endif // ENCODE_DICT_NODE_HPP
+#endif // ENCODE_DICT_NODE_H

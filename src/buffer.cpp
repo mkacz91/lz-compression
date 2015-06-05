@@ -1,4 +1,4 @@
-#include "buffer.hpp"
+#include "buffer.h"
 
 Buffer::Buffer () :
     m_data(new word[1]),

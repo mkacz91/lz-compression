@@ -1,12 +1,12 @@
-#ifndef SMRU_DICT_HPP
-#define SMRU_DICT_HPP
+#ifndef SMRU_DICT_H
+#define SMRU_DICT_H
 
-#include "prefix.hpp"
+#include "prefix.h"
 #include <list>
 #include <vector>
 
-#include "dict_base.hpp"
-#include "encode_dict_node.hpp"
+#include "dict_base.h"
+#include "encode_dict_node.h"
 
 // Base class for the SMRU encode and decode dictionaries for use during LZ78/
 // LZW factorization. Abbreviation SMRU stands for _Stongly Most Recently Used_
@@ -121,4 +121,4 @@ inline Codeword const& SmruDecodeDict::codeword (int i) const {
     return m_codewords[i];
 }
 
-#endif // SMRU_DICT_HPP
+#endif // SMRU_DICT_H

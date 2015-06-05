@@ -1,7 +1,7 @@
-#include "prefix.hpp"
+#include "prefix.h"
 
-#include "../src/lz78.hpp"
-#include "../src/smru_dict.hpp"
+#include "../src/lz78.h"
+#include "../src/smru_dict.h"
 
 class SmruLz78Test : public testing::Test {
 protected:

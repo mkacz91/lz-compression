@@ -5,12 +5,12 @@ project(LZCompression)
 
 
 set(LZC_HEADERS
-  src/buffer.hpp
-  src/dict_base.hpp
-  src/lz.hpp
-  src/lz78.hpp
-  src/smru_dict.hpp
-  src/prefix.hpp
+  src/buffer.h
+  src/dict_base.h
+  src/lz.h
+  src/lz78.h
+  src/smru_dict.h
+  src/prefix.h
 )
 
 set(LZC_SOURCES
@@ -25,7 +25,7 @@ set_property(TARGET lzc PROPERTY CXX_STANDARD_REQUIRED ON)
 
 
 set(LZC_TEST_HEADERS
-  test/prefix.hpp
+  test/prefix.h
 )
 
 set(LZC_TEST_SOURCES

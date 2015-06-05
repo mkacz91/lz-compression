@@ -1,4 +1,4 @@
-#include "smru_dict.hpp"
+#include "smru_dict.h"
 
 SmruDictBase::SmruDictBase (int limit) :
     DictBase(limit)

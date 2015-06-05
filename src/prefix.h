@@ -1,5 +1,5 @@
-#ifndef PREFIX_HPP
-#define PREFIX_HPP
+#ifndef PREFIX_H
+#define PREFIX_H
 
 #include <cassert>
 
@@ -62,4 +62,4 @@ inline int ceil_log2 (int n) {
     return i;
 }
 
-#endif // PREFIX_HPP
+#endif // PREFIX_H

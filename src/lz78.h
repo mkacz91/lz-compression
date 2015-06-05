@@ -1,9 +1,9 @@
-#ifndef LZ78_HPP
-#define LZ78_HPP
+#ifndef LZ78_H
+#define LZ78_H
 
-#include "prefix.hpp"
+#include "prefix.h"
 
-#include "lz.hpp"
+#include "lz.h"
 
 // TODO: documentation
 template <typename Dict>
@@ -68,4 +68,4 @@ Buffer Lz78<Dict>::decode (Buffer const& output) const {
     return input;
 }
 
-#endif // LZ78_HPP
+#endif // LZ78_H

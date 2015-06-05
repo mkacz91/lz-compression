@@ -1,4 +1,4 @@
-#include "prefix.hpp"
+#include "prefix.h"
 
 #include "../src/smru_dict.cpp"
 

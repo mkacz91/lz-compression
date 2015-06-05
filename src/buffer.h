@@ -1,7 +1,7 @@
-#ifndef BUFFER_HPP
-#define BUFFER_HPP
+#ifndef BUFFER_H
+#define BUFFER_H
 
-#include "prefix.hpp"
+#include "prefix.h"
 #include <vector>
 
 // A buffer for data. Cannot be accessed directly; designated readers and
@@ -218,4 +218,4 @@ inline BufferCharSlice::BufferCharSlice (
     assert(begin + m_length <= buffer.m_size / CHAR_LENGTH);
 }
 
-#endif // BUFFER_HPP
+#endif // BUFFER_H

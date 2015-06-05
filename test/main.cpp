@@ -1,4 +1,4 @@
-#include "prefix.hpp"
+#include "prefix.h"
 
 int main (int argc, char** argv) {
     cout << "Word size: " << sizeof(word) << "\n"

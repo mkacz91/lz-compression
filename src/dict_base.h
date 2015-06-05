@@ -1,7 +1,7 @@
-#ifndef DICT_BASE_HPP
-#define DICT_BASE_HPP
+#ifndef DICT_BASE_H
+#define DICT_BASE_H
 
-#include "prefix.hpp"
+#include "prefix.h"
 
 // **Note:** The classes defined here do not serve the purpose of making it
 // possible to use dictionaries in a polymorphic way (they are intended to be
@@ -103,4 +103,4 @@ inline bool Codeword::operator == (Codeword const& cw) const {
     return begin == cw.begin && length == cw.length;
 }
 
-#endif // DICT_BASE_HPP
+#endif // DICT_BASE_H

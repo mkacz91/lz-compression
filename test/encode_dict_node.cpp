@@ -1,6 +1,6 @@
-#include "prefix.hpp"
+#include "prefix.h"
 
-#include "../src/encode_dict_node.hpp"
+#include "../src/encode_dict_node.h"
 
 TEST (EncodeDictNodeTest, Initialization) {
     EncodeDictNode node1(5);

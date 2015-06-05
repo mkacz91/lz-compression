@@ -1,6 +1,6 @@
-#include "prefix.hpp"
+#include "prefix.h"
 
-#include "../src/buffer.hpp"
+#include "../src/buffer.h"
 
 TEST (BufferTest, BitIO) {
     Buffer buffer;

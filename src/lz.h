@@ -1,10 +1,10 @@
-#ifndef LZ_HPP
-#define LZ_HPP
+#ifndef LZ_H
+#define LZ_H
 
-#include "prefix.hpp"
+#include "prefix.h"
 
-#include "buffer.hpp"
-#include "dict_base.hpp"
+#include "buffer.h"
+#include "dict_base.h"
 
 class Lz {
 public:
@@ -33,4 +33,4 @@ inline Lz::Lz (int dictionary_limit) :
     // Do nothing.
 }
 
-#endif // LZ_HPP
+#endif // LZ_H
