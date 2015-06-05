@@ -6,6 +6,9 @@
 #include "buffer.h"
 #include "dict_base.h"
 
+// Lz
+// =============================================================================
+//
 class Lz {
 public:
     // Constructs a new LZ encoder/decoder with a dictionary of given limit.
@@ -30,7 +33,7 @@ inline Lz::Lz (int dictionary_limit) :
             : WORD_LENGTH
     )
 {
-    // Do nothing.
+    /* Do nothing */
 }
 
 #endif // LZ_H

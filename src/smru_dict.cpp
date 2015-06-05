@@ -1,5 +1,8 @@
 #include "smru_dict.h"
 
+// SmruDictBase
+// =============================================================================
+
 SmruDictBase::SmruDictBase (int limit) :
     DictBase(limit)
 {
@@ -68,6 +71,9 @@ int SmruDictBase::match (int i) {
     }
 }
 
+// SmruEncodeDict
+// =============================================================================
+
 SmruEncodeDict::SmruEncodeDict(int limit) :
     SmruDictBase(limit)
 {
@@ -81,11 +87,14 @@ SmruEncodeDict::SmruEncodeDict(int limit) :
     m_node = &m_nodes.front();
 }
 
+// SmruDecodeDict
+// =============================================================================
+
 SmruDecodeDict::SmruDecodeDict (int limit) :
     SmruDictBase(limit),
     m_codewords(limit + 1, Codeword(0, 0))
 {
-    // Do nothing.
+    /* Do nothing */
 }
 
 int SmruEncodeDict::try_char (char a) {

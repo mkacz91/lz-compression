@@ -8,6 +8,9 @@
 #include "dict_base.h"
 #include "encode_dict_node.h"
 
+// SmruDictBase
+// =============================================================================
+//
 // Base class for the SMRU encode and decode dictionaries for use during LZ78/
 // LZW factorization. Abbreviation SMRU stands for _Stongly Most Recently Used_
 // and refers to the codeword discard strategy.
@@ -58,6 +61,9 @@ private:
     std::vector<std::list<int>::iterator> m_queue_positions;
 };
 
+// SmruEncodeDict
+// =============================================================================
+//
 // The SMRU dictionary specialized for **encoding**.
 class SmruEncodeDict : public SmruDictBase, public EncodeDictBase {
 public:
@@ -82,6 +88,13 @@ private:
     Node* m_node;
 };
 
+inline int SmruEncodeDict::peek_codeword_no () const {
+    return m_node->codeword_no();
+}
+
+// SmruDecodeDict
+// =============================================================================
+//
 // The SMRU dictionary specialized for **decoding**.
 class SmruDecodeDict : public SmruDictBase, public DecodeDictBase {
 public:
@@ -99,16 +112,6 @@ private:
     std::vector<Codeword> m_codewords;
 };
 
-class SmruDict {
-public:
-    typedef SmruEncodeDict EncodeDict;
-    typedef SmruDecodeDict DecodeDict;
-};
-
-inline int SmruEncodeDict::peek_codeword_no () const {
-    return m_node->codeword_no();
-}
-
 inline void SmruDecodeDict::add_extension (int i, int begin) {
     assert(0 <= i && i < m_codewords.size());
 
@@ -120,5 +123,13 @@ inline void SmruDecodeDict::add_extension (int i, int begin) {
 inline Codeword const& SmruDecodeDict::codeword (int i) const {
     return m_codewords[i];
 }
+
+// SmruDict
+// =============================================================================
+class SmruDict {
+public:
+    typedef SmruEncodeDict EncodeDict;
+    typedef SmruDecodeDict DecodeDict;
+};
 
 #endif // SMRU_DICT_H

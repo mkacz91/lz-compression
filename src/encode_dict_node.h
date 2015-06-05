@@ -5,6 +5,9 @@
 
 #include <unordered_map>
 
+// EncodeDictNode
+// =============================================================================
+// 
 // A word-tree node for use in LZ78/LZW dictionary implementation during
 // encoding.
 //
@@ -78,7 +81,7 @@ inline EncodeDictNode::EncodeDictNode (int codeword_no)
     : m_parent(nullptr)
     , m_codeword_no(max(0, codeword_no))
 {
-    // Do nothing
+    /* Do nothing */
 }
 
 inline EncodeDictNode* EncodeDictNode::parent () {

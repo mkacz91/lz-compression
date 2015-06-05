@@ -9,6 +9,9 @@
 // They exist rather to impose interface and provide a place for common
 // documentation.
 
+// DictBase
+// =============================================================================
+//
 // Base class for all ditionaries to be used by LZ78/LZW encoders/decoders.
 class DictBase {
 public:
@@ -31,6 +34,19 @@ protected:
     int m_limit;
 };
 
+inline DictBase::DictBase (int limit) :
+    m_limit(limit)
+{
+    assert(limit >= 0);
+}
+
+inline int DictBase::limit () const {
+    return m_limit;
+}
+
+// EncodeDictBase
+// =============================================================================
+//
 // Base class for all dictionaries specialized for **encoding**. Derived class
 // should also inherit from `DictBase`.
 //
@@ -57,6 +73,9 @@ public:
     virtual int peek_codeword_no () const = 0;
 };
 
+// Codeword
+// =============================================================================
+//
 // Representation of a codeword. A codeword is a subsequence of the input.
 // Such subsequence is determined by its starting index `begin` and its
 // `length`.
@@ -71,6 +90,20 @@ struct Codeword {
     inline bool operator == (Codeword const& cw) const;
 };
 
+inline Codeword::Codeword (int begin, int length) :
+    begin(begin),
+    length(length)
+{
+    /* Do nothing */
+}
+
+inline bool Codeword::operator == (Codeword const& cw) const {
+    return begin == cw.begin && length == cw.length;
+}
+
+// DecodeDictBase
+// =============================================================================
+//
 // Base class for all dictionaries specialized for **decoding**. Derived class
 // should also inherit from `DictBase`.
 class DecodeDictBase {
@@ -81,26 +114,5 @@ class DecodeDictBase {
     // Returns the `i`th codeword.
     virtual Codeword const& codeword (int i) const = 0;
 };
-
-inline DictBase::DictBase (int limit) :
-    m_limit(limit)
-{
-    assert(limit >= 0);
-}
-
-inline int DictBase::limit () const {
-    return m_limit;
-}
-
-inline Codeword::Codeword (int begin, int length) :
-    begin(begin),
-    length(length)
-{
-    // Do nothing.
-}
-
-inline bool Codeword::operator == (Codeword const& cw) const {
-    return begin == cw.begin && length == cw.length;
-}
 
 #endif // DICT_BASE_H

@@ -69,7 +69,7 @@ BufferBitReader::BufferBitReader(Buffer const& buffer) :
     m_pos(0),
     m_offset(WORD_LENGTH)
 {
-    // Do nothing.
+    /* Do nothing */
 }
 
 word BufferBitReader::get (int bit_cnt) {
@@ -93,7 +93,7 @@ BufferBitWriter::BufferBitWriter(Buffer& buffer) :
     m_pos(buffer.m_size / WORD_LENGTH),
     m_offset(WORD_LENGTH - buffer.m_size % WORD_LENGTH)
 {
-    // Do nothing.
+    /* Do nothing */
 }
 
 void BufferBitWriter::put (word data, int bit_cnt) {
@@ -116,7 +116,7 @@ BufferCharReader::BufferCharReader (Buffer const& buffer) :
     m_char_cnt(buffer.m_size / CHAR_LENGTH),
     m_pos(0)
 {
-    // Do nothing
+    /* Do nothing */
 }
 
 BufferCharWriter::BufferCharWriter (Buffer& buffer) :

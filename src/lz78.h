@@ -5,6 +5,9 @@
 
 #include "lz.h"
 
+// Lz78
+// =============================================================================
+//
 // TODO: documentation
 template <typename Dict>
 class Lz78 : public Lz {
@@ -20,7 +23,7 @@ template <typename Dict>
 Lz78<Dict>::Lz78 (int dictionary_limit) :
     Lz(dictionary_limit)
 {
-    // Do nothing.
+    /* Do nothing */
 }
 
 template <typename Dict>

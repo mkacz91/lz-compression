@@ -17,7 +17,7 @@ protected:
 SmruLz78Test::SmruLz78Test () :
     lz78(3)
 {
-    // Do nothing.
+    /* Do nothing */
 }
 
 void SmruLz78Test::SetUp () {

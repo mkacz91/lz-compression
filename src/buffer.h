@@ -4,6 +4,9 @@
 #include "prefix.h"
 #include <vector>
 
+// Buffer
+// =============================================================================
+//
 // A buffer for data. Cannot be accessed directly; designated readers and
 // writers are needed.
 class Buffer {
@@ -58,9 +61,16 @@ private:
     friend std::ostream& operator << (std::ostream& ostr, Buffer const& buffer);
 };
 
+inline int Buffer::size () const {
+    return m_size;
+}
+
 // Pretty printing of buffer in binary form.
 std::ostream& operator << (std::ostream& ostr, Buffer const& buffer);
 
+// BufferBitReader
+// =============================================================================
+//
 // A buffer reader that allows reading individual bits.
 class BufferBitReader {
 public:
@@ -93,6 +103,13 @@ private:
     int m_offset;
 };
 
+inline bool BufferBitReader::eob () const {
+    return m_left <= 0;
+}
+
+// BufferBitWriter
+// =============================================================================
+//
 // A buffer writer that allows appending individual bits.
 class BufferBitWriter {
 public:
@@ -116,6 +133,9 @@ private:
     int m_offset;
 };
 
+// BufferCharReader
+// =============================================================================
+//
 // A buffer reader that allows reading char by char.
 class BufferCharReader {
 public:
@@ -143,6 +163,18 @@ private:
     int m_pos;
 };
 
+inline char BufferCharReader::get () {
+    assert(m_pos < m_char_cnt);
+    return m_data[m_pos++];
+}
+
+inline bool BufferCharReader::eob () const {
+    return m_pos >= m_char_cnt;
+}
+
+// BufferCharSlice
+// =============================================================================
+//
 // A slice of buffer data interpreted with char resolution.
 class BufferCharSlice {
 public:
@@ -164,6 +196,21 @@ private:
     friend class BufferCharWriter;
 };
 
+inline BufferCharSlice::BufferCharSlice (
+    Buffer const& buffer,
+    int begin,
+    int length
+) :
+    m_begin(reinterpret_cast<char const*>(buffer.m_data) + begin),
+    m_length(max(0, length))
+{
+    assert(begin < buffer.m_size / CHAR_LENGTH || m_length == 0);
+    assert(begin + m_length <= buffer.m_size / CHAR_LENGTH);
+}
+
+// BufferCharWriter
+// =============================================================================
+//
 // A buffer writer that allows writing with char resolution.
 class BufferCharWriter {
 public:
@@ -188,34 +235,5 @@ private:
     // to on a call to `put()`.
     int m_pos;
 };
-
-inline int Buffer::size () const {
-    return m_size;
-}
-
-inline bool BufferBitReader::eob () const {
-    return m_left <= 0;
-}
-
-inline char BufferCharReader::get () {
-    assert(m_pos < m_char_cnt);
-    return m_data[m_pos++];
-}
-
-inline bool BufferCharReader::eob () const {
-    return m_pos >= m_char_cnt;
-}
-
-inline BufferCharSlice::BufferCharSlice (
-    Buffer const& buffer,
-    int begin,
-    int length
-) :
-    m_begin(reinterpret_cast<char const*>(buffer.m_data) + begin),
-    m_length(max(0, length))
-{
-    assert(begin < buffer.m_size / CHAR_LENGTH || m_length == 0);
-    assert(begin + m_length <= buffer.m_size / CHAR_LENGTH);
-}
 
 #endif // BUFFER_H
