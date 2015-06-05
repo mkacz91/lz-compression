@@ -11,13 +11,12 @@ using std::endl;
 #include <string>
 using std::string;
 
-#include <limits>
+#include <cstdint>
 // TODO: Investigate 32 vs 64 bit
-typedef unsigned int uint;
-typedef unsigned long long word;
-int const WORD_LENGTH = std::numeric_limits<word>::digits;
+typedef uint32_t word;
+int const WORD_LENGTH = 32;
 int const CHAR_LENGTH = 8;
-word const NULL_WORD = 0u;
+word const NULL_WORD = 0;
 word const ONES_MASK = ~NULL_WORD;
 int const CHAR_CNT = 256;
 
