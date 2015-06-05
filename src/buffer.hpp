@@ -13,14 +13,41 @@ public:
 
     Buffer (Buffer&& buffer);
 
+    ~Buffer ();
+
     // Returns number of bits stored in the buffer.
     int size () const;
 
+    // Returns `true` if the contents of `buffer` are equal to the contents of
+    // this buffer.
     bool operator == (Buffer const& buffer) const;
 
 private:
-    std::vector<word> m_buffer;
+    // The underlying data array.
+    word* m_data;
+
+    // Number of words allocated by `m_data`.
+    int m_capacity;
+
+    // Number of initial words of `m_data` that are in use.
+    int m_open_word_cnt;
+
+    // Size of the buffer in bits.
     int m_size;
+
+    // Opens a new cell of `m_data` and initiates it with value `data`.
+    void push_back (word data);
+
+    // Makes sure `m_data` is able to store given number of words. Reallocates
+    // if necessary and returns the pointer to the old `m_data` which has to be
+    // released by the caller. If no reallocation is done, `nullptr` is
+    // returned.
+    //
+    // The reason not to release the old `m_data` automatically is to allow
+    // additional processing between the creation of new `m_data` and the
+    // deletion of the old one. This is used in
+    // `BufferCharWriter::put(BufferCharSlice)`.
+    word* adjust_capacity (int word_cnt);
 
     friend class BufferBitReader;
     friend class BufferBitWriter;
@@ -31,15 +58,19 @@ private:
     friend std::ostream& operator << (std::ostream& ostr, Buffer const& buffer);
 };
 
+// Pretty printing of buffer in binary form.
 std::ostream& operator << (std::ostream& ostr, Buffer const& buffer);
 
 // A buffer reader that allows reading individual bits.
 class BufferBitReader {
 public:
     // Constructs a bit reader attached to given buffer.
+    //
+    // **Warning:** The reader is valid only for as long as `buffer` is not
+    // altered.
     BufferBitReader (Buffer const& buffer);
 
-    // Rteurns the next `bit_count` bits of the buffer and advances the read
+    // Rteurns the next `bit_cnt` bits of the buffer and advances the read
     // position.
     word get (int bit_cnt);
 
@@ -47,9 +78,18 @@ public:
     bool eob () const;
 
 private:
-    word const* const m_buffer;
+    // The data array of the attached buffer.
+    word const* const m_data;
+
+    // Number of words left to read.
     int m_left;
+
+    // Index of the current word within `m_data` to start reading from on a call
+    // to `get()`.
     int m_pos;
+
+    // Index of the least significant bit within the current word (indicated by
+    // `m_pos`) to start reading from on a call to `get()`.
     int m_offset;
 };
 
@@ -59,14 +99,20 @@ public:
     // Constructs a bit writer attached to given buffer.
     BufferBitWriter (Buffer& buffer);
 
-    // Appends `bit_count` rightmost bits pf `data` to the buffer. The value
-    // `bit_count` may not exceed `WORD_LENGTH`.
+    // Appends `bit_count` least significant bits of `data` to the buffer. The
+    // value `bit_count` may not exceed `WORD_LENGTH`.
     void put (word data, int bit_cnt);
 
 private:
-    std::vector<word>& m_buffer;
-    int& m_size;
+    // The attached buffer.
+    Buffer& m_buffer;
+
+    // Index of the current word within `m_buffer.m_data` to start writing to on
+    // a call to `put()`.
     int m_pos;
+
+    // Index of the least significant bit within the current word (indicated by
+    // `m_pos`) to start writing to on a call to `put()`.
     int m_offset;
 };
 
@@ -74,6 +120,9 @@ private:
 class BufferCharReader {
 public:
     // Constructs a char reader attached to given buffer.
+    //
+    // **Warning:** The reader is valid only for as long as `buffer` is not
+    // altered.
     BufferCharReader (Buffer const& buffer);
 
     // Returns the next char from the attached buffer.
@@ -83,8 +132,14 @@ public:
     bool eob () const;
 
 private:
-    char const* const m_buffer;
-    int const m_size;
+    // The data array of the attached buffer.
+    char const* const m_data;
+
+    // Number of characters stored in `m_data`.
+    int const m_char_cnt;
+
+    // Index of the current char within `m_data` to be read from on a call to
+    // `get()`. Cannot exceed `m_char_cnt`.
     int m_pos;
 };
 
@@ -93,10 +148,17 @@ class BufferCharSlice {
 public:
     // Constructs a new slice of given length, starting at char with index
     // `begin` and ending. Providing `length <= 0` results in an empty slice.
+    //
+    // **Warning:** The slice is only valid for as long as `buffer` is not
+    // altered.
     BufferCharSlice (Buffer const& buffer, int begin, int length);
 
 private:
+    // Starting address of the slice. This points directly into the `m_data`
+    // array of the origin buffer.
     char const* const m_begin;
+
+    // Length of the slice (in chars).
     int const m_length;
 
     friend class BufferCharWriter;
@@ -114,74 +176,34 @@ public:
     // Appends a string to the buffer.
     void put (string const& data);
 
-    // Appends a buffer slice to the buffer. The slice may come from a different
-    // buffer or it may come from the same buffer.
+    // Appends a slice to the buffer. This operation is valid even if `slice`
+    // comes from the same buffer it is being written to.
     void put (BufferCharSlice const& slice);
 
 private:
-    std::vector<word>& m_buffer;
-    int& m_size;
+    // The attached buffer.
+    Buffer& m_buffer;
+
+    // Index of the current character within `m_buffer.m_data` to start writing
+    // to on a call to `put()`.
     int m_pos;
 };
 
-inline Buffer::Buffer () :
-    m_buffer(1, NULL_WORD),
-    m_size(0)
-{
-    // Do nothing.
-}
-
-inline Buffer::Buffer (Buffer&& buffer) :
-    m_size(buffer.m_size)
-{
-    swap(m_buffer, buffer.m_buffer);
-}
-
 inline int Buffer::size () const {
     return m_size;
-}
-
-inline bool Buffer::operator == (Buffer const& buffer) const {
-    return m_size == buffer.m_size && m_buffer == buffer.m_buffer;
-}
-
-inline BufferBitReader::BufferBitReader(Buffer const& buffer) :
-    m_buffer(buffer.m_buffer.data()),
-    m_left(buffer.m_size),
-    m_pos(0),
-    m_offset(WORD_LENGTH)
-{
-    // Do nothing.
 }
 
 inline bool BufferBitReader::eob () const {
     return m_left <= 0;
 }
 
-inline BufferBitWriter::BufferBitWriter(Buffer& buffer) :
-    m_buffer(buffer.m_buffer),
-    m_size(buffer.m_size),
-    m_pos(buffer.m_size / WORD_LENGTH),
-    m_offset(WORD_LENGTH - buffer.m_size % WORD_LENGTH)
-{
-    // Do nothing.
-}
-
-inline BufferCharReader::BufferCharReader (Buffer const& buffer) :
-    m_buffer(reinterpret_cast<char const*>(buffer.m_buffer.data())),
-    m_size(buffer.m_size / CHAR_LENGTH),
-    m_pos(0)
-{
-    // Do nothing
-}
-
 inline char BufferCharReader::get () {
-    assert(m_pos < m_size);
-    return m_buffer[m_pos++];
+    assert(m_pos < m_char_cnt);
+    return m_data[m_pos++];
 }
 
 inline bool BufferCharReader::eob () const {
-    return m_pos >= m_size;
+    return m_pos >= m_char_cnt;
 }
 
 inline BufferCharSlice::BufferCharSlice (
@@ -189,21 +211,11 @@ inline BufferCharSlice::BufferCharSlice (
     int begin,
     int length
 ) :
-    m_begin(reinterpret_cast<char const*>(buffer.m_buffer.data()) + begin),
+    m_begin(reinterpret_cast<char const*>(buffer.m_data) + begin),
     m_length(max(0, length))
 {
-    // Permit only proper ranges.
-    assert(begin < buffer.size() / CHAR_LENGTH || m_length == 0);
-    assert(begin + m_length <= buffer.size() / CHAR_LENGTH);
-}
-
-inline BufferCharWriter::BufferCharWriter (Buffer& buffer) :
-    m_buffer(buffer.m_buffer),
-    m_size(buffer.m_size),
-    m_pos(buffer.m_size / CHAR_LENGTH)
-{
-    // Permit only properly aligned buffers.
-    assert(buffer.m_size % CHAR_LENGTH == 0);
+    assert(begin < buffer.m_size / CHAR_LENGTH || m_length == 0);
+    assert(begin + m_length <= buffer.m_size / CHAR_LENGTH);
 }
 
 #endif // BUFFER_HPP
