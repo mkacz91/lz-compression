@@ -11,7 +11,7 @@ protected:
 
     SmruLz78Test ();
 
-    void SetUp () override;
+    virtual void SetUp ();
 };
 
 SmruLz78Test::SmruLz78Test () :
