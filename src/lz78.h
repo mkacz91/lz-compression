@@ -3,25 +3,28 @@
 
 #include "prefix.h"
 
-#include "lz.h"
+#include "lz_base.h"
 
 // Lz78
 // =============================================================================
 //
 // TODO: documentation
 template <typename Dict>
-class Lz78 : public Lz {
+class Lz78 : public LzBase {
 public:
+    // Construct an LZ78 encoder/decoder with given dictionary limit.
     Lz78 (int dictionary_limit);
 
+    // Implements `LzBase::encode(Buffer const&) const`.
     virtual Buffer encode(Buffer const& input) const;
 
+    // Implements `LzBase::decode(Buffer const&) const`.
     virtual Buffer decode(Buffer const& output) const;
 };
 
 template <typename Dict>
 Lz78<Dict>::Lz78 (int dictionary_limit) :
-    Lz(dictionary_limit)
+    LzBase(dictionary_limit)
 {
     /* Do nothing */
 }
@@ -33,17 +36,32 @@ Buffer Lz78<Dict>::encode (Buffer const& input) const {
     BufferCharReader reader(input);
     BufferBitWriter writer(output);
 
+    // Number of positions ahead of the encoded part.
+    int ahead = 0;
+    // The outer loop iterates only at the end of the processed input and is
+    // due to the presence of artificial terminating character.
     while (!reader.eob()) {
-        char a = reader.get();
-        int codeword_no = dict.try_char(a);
-        if (codeword_no != -1) {
-            writer.put(codeword_no, m_codeword_no_length);
-            writer.put(a, CHAR_LENGTH);
+        // Most of the work is done in this loop.
+        while (!reader.eob()) {
+            char a = reader.get();
+            ++ahead;
+            Match match = dict.try_char(a);
+            if (match.is_maximal()) {
+                writer.put(match.codeword_no, m_codeword_no_length);
+                writer.put(match.extending_char, CHAR_LENGTH);
+                reader.put_back(ahead - match.length - 1);
+                ahead = 0;
+            }
+        }
+        // Behave as if a special terminating char was present.
+        Match match = dict.fail_char();
+        writer.put(match.codeword_no, m_codeword_no_length);
+        if (match.length != ahead) {
+            writer.put(match.extending_char, CHAR_LENGTH);
+            reader.put_back(ahead - match.length);
+            ahead = 0;
         }
     }
-    // Append the 'incomplete' match.
-    if (dict.peek_codeword_no() > 0)
-        writer.put(dict.peek_codeword_no(), m_codeword_no_length);
 
     return output;
 }
@@ -55,16 +73,18 @@ Buffer Lz78<Dict>::decode (Buffer const& output) const {
     BufferCharWriter writer(input);
     BufferBitReader reader(output);
 
-    int size = 0;
+    // Starting position of the part not yet decoded.
+    int pos = 0;
     while (!reader.eob()) {
-        int codeword_no = reader.get(m_codeword_no_length);
-        Codeword cw = dict.codeword(codeword_no);
-        dict.add_extension(codeword_no, size);
+        int i = reader.get(m_codeword_no_length);
+        Codeword cw = dict.codeword(i);
+        dict.add_extension(i, pos);
         writer.put(BufferCharSlice(input, cw.begin, cw.length));
-        size += cw.length;
+        pos += cw.length;
+        // If this was the last codeword, no extending character follows.
         if (!reader.eob()) {
             writer.put(reader.get(CHAR_LENGTH));
-            ++size;
+            ++pos;
         }
     }
 

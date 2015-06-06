@@ -46,8 +46,6 @@ protected:
     //
     // If the length of the new codeword would exceed the limit, nothing is
     // actually done and the return value is `0`.
-    //
-    // **Note:** The indexing of codewords is 1-based.
     int match (int i);
 
 private:
@@ -71,11 +69,11 @@ public:
     SmruEncodeDict (int limit);
 
     // Implements `EncodeDictBase::try_char(char)`. If the resulting new
-    // codeword would exceed the maximal length, it is siletly ignored.
-    virtual int try_char (char a);
+    // codeword would exceed the maximal length, it is rejected.
+    virtual Match try_char (char a);
 
-    // Implements `EncodeDictBase::peek_codeword_no() const`.
-    virtual int peek_codeword_no () const;
+    // Implements `EncodeDictBase::fail_char(char)`.
+    virtual Match fail_char ();
 
 private:
     typedef EncodeDictNode Node;
@@ -86,11 +84,10 @@ private:
 
     // Pointer to the current state of the automaton, i.e., the longest match.
     Node* m_node;
-};
 
-inline int SmruEncodeDict::peek_codeword_no () const {
-    return m_node->codeword_no();
-}
+    // The length of the current longest match.
+    int m_match_length;
+};
 
 // SmruDecodeDict
 // =============================================================================
@@ -106,7 +103,7 @@ public:
     virtual void add_extension (int i, int begin);
 
     // Implements `DecodeDictBase::codeword(int)`.
-    virtual Codeword const& codeword(int i) const;
+    virtual Codeword const& codeword (int i) const;
 
 private:
     std::vector<Codeword> m_codewords;

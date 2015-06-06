@@ -7,7 +7,7 @@ project(LZCompression)
 set(LZC_HEADERS
   src/buffer.h
   src/dict_base.h
-  src/lz.h
+  src/lz_base.h
   src/lz78.h
   src/smru_dict.h
   src/prefix.h

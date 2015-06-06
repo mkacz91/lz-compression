@@ -85,6 +85,7 @@ SmruEncodeDict::SmruEncodeDict(int limit) :
 
     // Search starts at root.
     m_node = &m_nodes.front();
+    m_match_length = 0;
 }
 
 // SmruDecodeDict
@@ -97,22 +98,32 @@ SmruDecodeDict::SmruDecodeDict (int limit) :
     /* Do nothing */
 }
 
-int SmruEncodeDict::try_char (char a) {
+Match SmruEncodeDict::try_char (char a) {
     int i = m_node->codeword_no();
     Node* next_node = m_node->child(a);
     if (next_node != nullptr) {
-        // Still matching. Can possibly be extended.
+        // Still matching. This is not necessarily a maximal match.
         m_node = next_node;
-        return -1;
+        ++m_match_length;
+        return Match();
     } else {
         // Maximal match found. New node has to be added.
         int j = this->match(i);
-        // We don't update the dictionary if the new codeword is too long. This
-        // is indicated with `j == 0`
+        // Don't update the dictionary if the new codeword is too long. This
+        // is indicated with `j == 0`.
         if (j != 0)
             m_node->link_child(a, &m_nodes[j]);
+        int length = m_match_length;
         // New search starts at root.
         m_node = &m_nodes.front();
-        return i;
+        m_match_length = 0;
+        return Match(i, length, a);
     }
+}
+
+Match SmruEncodeDict::fail_char () {
+    int i = m_node->codeword_no();
+    // New search starts at root.
+    m_node = &m_nodes.front();
+    return Match(i, m_match_length, '\0'); // The extending char is irrelevant.
 }

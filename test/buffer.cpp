@@ -76,6 +76,12 @@ TEST (BufferTest, CharIO) {
     ASSERT_FALSE(reader.eob());
     ASSERT_EQ('w', reader.get());
     ASSERT_FALSE(reader.eob());
+    reader.put_back(2);
+    ASSERT_FALSE(reader.eob());
+    ASSERT_EQ('d', reader.get());
+    ASSERT_FALSE(reader.eob());
+    ASSERT_EQ('w', reader.get());
+    ASSERT_FALSE(reader.eob());
     ASSERT_EQ('x', reader.get());
     ASSERT_FALSE(reader.eob());
     ASSERT_EQ('e', reader.get());

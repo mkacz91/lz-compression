@@ -44,6 +44,61 @@ inline int DictBase::limit () const {
     return m_limit;
 }
 
+// Match
+// =============================================================================
+//
+// Info about maximal match during the encoding phase. Carries the index and
+// length of the longest matching codeword as well as the first character that
+// didn't match. That last character is called `extending_char` as it is the
+// added to the longest match to form a new codeword.
+//
+// Instances of `Match` have to be returned even if no maximal match was
+// found and therefore no new codeword is created. For that purpose, a special,
+// otherwise invalid, value is permitted, namely `codeword_no = -1`. The other
+// fields are unspecified in such case.
+struct Match {
+    int codeword_no;
+    int length;
+    char extending_char;
+
+    // Constructs a new match with given codeword number and length.
+    Match (int codeword_no, int length, char extending_char);
+
+    // Constructs a non-maximal match.
+    Match ();
+
+    // Returns `true` if this is a maximal match.
+    bool is_maximal () const;
+
+    // Retuns `true` if `match` is equal to this match.
+    bool operator == (Match const& match) const;
+};
+
+inline Match::Match (int codeword_no, int length, char extending_char) :
+    codeword_no(codeword_no),
+    length(length),
+    extending_char(extending_char)
+{
+    assert(codeword_no >= 0 && length >= 0);
+}
+
+inline Match::Match () :
+    // Other values undefined.
+    codeword_no(-1)
+{
+    /* Do nothing */
+}
+
+inline bool Match::is_maximal () const {
+    return codeword_no != -1;
+}
+
+inline bool Match::operator == (Match const& match) const {
+    return codeword_no == match.codeword_no
+        && length == match.length
+        && extending_char == match.extending_char;
+}
+
 // EncodeDictBase
 // =============================================================================
 //
@@ -57,20 +112,33 @@ public:
     // Advances the internal state of the automaton, trying to match the
     // currently matched codeword extended by another letter, i.e., `a`.
     //
-    // If there is a match, the result is -1, meaning that a longer match may
-    // exist. Non-negative result indicates success. It means that the word
-    // composed of characters provided after the last successful call to
-    // `try_char()`, excluding the current one, is the longest matching
-    // codeword present in the dictionary. The result is then the number of the
-    // matching codeword, or 0 for the empty codeword.
+    // If there is a match, the result is a _non maximal_ instance of `Match`,
+    // which can be checked with `Match::is_maximal()`. If the provided char
+    // cannot be used to extend the current match, a maximal match is yielded.
     //
     // On success, a new codeword is added. In limited dictionaries this may
-    // involve discarding some other codeword.
-    virtual int try_char (char a) = 0;
+    // involve discarding some other codeword or rejecting the new one. Unless
+    // the limit has been reached the codewords should receive the consecutive
+    // integers as indices, starting from 1. Codeword number 0 is the special
+    // _empty codeword_.
+    virtual Match try_char (char a) = 0;
 
-    // Returns the number of the currently matched codeword, that may still be
-    // extended.
-    virtual int peek_codeword_no () const = 0;
+    // This methods acts as if `try_char()` was called with a special character
+    // that hasn't and won't occur in the processed text. This is to allow
+    // putting an unique character indicating _end of input_.
+    //
+    // **Warning:** If the `extending_char` field of the resulting `Match` is
+    // the imaginary unique character, it is obviously impossible to express it
+    // in terms of the `char` datatype. The caller must rely on the context
+    // of computation to determina if it's safe to use that value.
+    //
+    // __I was considering setting the type of the argument to `try_char()` to
+    // `int` which would allow passing the artificial character and
+    // `fail_char()` woudln't be needed. But this would introduce some
+    // additional branching in `try_char()`, which could affect performance as
+    // that method is called very often. If someone feels like implementing and
+    // testing that approach, he or she is very welcome to do so.__
+    virtual Match fail_char () = 0;
 };
 
 // Codeword
@@ -108,7 +176,9 @@ inline bool Codeword::operator == (Codeword const& cw) const {
 // should also inherit from `DictBase`.
 class DecodeDictBase {
     // Adds new codeword to the dictionary. The new codeword starts at `begin`
-    // and is a one-letter extension of the existing codeword `i`.
+    // and is a one-letter extension of the existing codeword `i`. Unless the
+    // limit has been reached the codewords should receive the consecutive
+    // integers as indices, starting from 1.
     virtual void add_extension (int i, int begin) = 0;
 
     // Returns the `i`th codeword.

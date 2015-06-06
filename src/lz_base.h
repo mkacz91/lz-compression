@@ -1,22 +1,25 @@
-#ifndef LZ_H
-#define LZ_H
+#ifndef LZ_BASE_H
+#define LZ_BASE_H
 
 #include "prefix.h"
 
 #include "buffer.h"
 #include "dict_base.h"
 
-// Lz
+// LzBase
 // =============================================================================
 //
-class Lz {
+// Base class for LZ encoders/decoders.
+class LzBase {
 public:
     // Constructs a new LZ encoder/decoder with a dictionary of given limit.
-    // Non-positive `dictionary_limit` results in an unlimited dictionary.
-    Lz (int dictionary_limit);
+    LzBase (int dictionary_limit);
 
+    // Encode the `input` buffer interpreted as sequence of chars.
     virtual Buffer encode (Buffer const& input) const = 0;
 
+    // Decode the `output` buffer. The resulting buffer is can be read as
+    // a sequence of chars. This is an iverse operation to `encode()`.
     virtual Buffer decode (Buffer const& output) const = 0;
 
 protected:
@@ -25,7 +28,7 @@ protected:
     int const m_codeword_no_length;
 };
 
-inline Lz::Lz (int dictionary_limit) :
+inline LzBase::LzBase (int dictionary_limit) :
     m_dictionary_limit(max(0, dictionary_limit)),
     m_codeword_no_length(
         m_dictionary_limit > 0

@@ -148,6 +148,9 @@ public:
     // Returns the next char from the attached buffer.
     char get ();
 
+    // Decreases the read position by `char_cnt` characters.
+    void put_back (int char_cnt);
+
     // Returns `true` if there is no more data to read.
     bool eob () const;
 
@@ -166,6 +169,11 @@ private:
 inline char BufferCharReader::get () {
     assert(m_pos < m_char_cnt);
     return m_data[m_pos++];
+}
+
+inline void BufferCharReader::put_back (int char_cnt) {
+    assert(0 <= char_cnt && char_cnt <= m_pos);
+    m_pos -= char_cnt;
 }
 
 inline bool BufferCharReader::eob () const {
