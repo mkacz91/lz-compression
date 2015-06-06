@@ -27,28 +27,28 @@ SmruLzwTest::SmruLzwTest () :
     // 1: a*
     owriter.put(1, cwbits);
     // (a [a) b]
-    // 2: a*, 1: aa
+    // 1: aa, 2: a*
     owriter.put(2, cwbits);
     // (a [a)(b] a)
-    // 3: b*, 2: ab, 1: aa
+    // 1: aa, 2: ab, 3: b*
     owriter.put(256 + 2, cwbits);
     //  a [a (b][a) b  b]
-    // 2: ab, 1: ab*, 3: ba
+    // 3: ba, 1: ab*, 2: ab
     owriter.put(256 + 3, cwbits);
     //  a [a (b] a) b (b  a  c)
-    // 3: ba, 1: ba*, 2: ab
+    // 2: ab, 1: ba*, 3: ba
     owriter.put(3, cwbits);
     //  a  a (b  a) b (b  a [c) a]
-    // 2: c*, 3: ba, 1: bac
+    // 1: bac, 3: ba, 2: c*
     owriter.put(1, cwbits);
     //  a  a (b  a) b  b  a [c (a] b)
-    // 1: a*, 2: ca, 3: ba
+    // 3: ba, 2: ca, 1: a*
     owriter.put(256 + 2, cwbits);
     //  a  a (b  a) b  b  a  c (a [b) a c]
-    // 3: ba, 2: ba*, 1: ab
+    // 1: ab, 2: ba*, 3: ba
     owriter.put(3, cwbits);
     //  a  a (b  a) b  b  a  c  a [b  a (c] $)
-    // 1: c*, 3: ba, 2: bac
+    // 2: bac, 3: ba, 1: c*
 }
 
 TEST_F (SmruLzwTest, Encoding) {
