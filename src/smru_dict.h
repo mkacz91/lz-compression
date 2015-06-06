@@ -27,7 +27,7 @@
 // efficient storage, match lookup and the overall linear time of the LZ
 // encoding.
 class SmruDictBase : public DictBase {
-protected:
+public:
     // Creates a dictionary with given limit. The limits is the upper bound for
     // both, the number of codewords and the length of a single codeword.
     explicit SmruDictBase (int limit);

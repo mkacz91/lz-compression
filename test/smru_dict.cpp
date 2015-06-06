@@ -2,6 +2,8 @@
 
 #include "../src/smru_dict.cpp"
 
+// TODO: There are no tests for DictBase::mark_as_permanent()
+
 TEST (SmruDictTest, Encoding) {
     SmruEncodeDict d(3);
     ASSERT_EQ(Match(0, 0, 'a'), d.try_char('a'));

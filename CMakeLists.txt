@@ -9,8 +9,9 @@ set(LZC_HEADERS
   src/dict_base.h
   src/lz_base.h
   src/lz78.h
-  src/smru_dict.h
+  src/lzw.h
   src/prefix.h
+  src/smru_dict.h
 )
 
 set(LZC_SOURCES
@@ -32,6 +33,7 @@ set(LZC_TEST_SOURCES
   test/buffer.cpp
   test/encode_dict_node.cpp
   test/lz78.cpp
+  test/lzw.cpp
   test/main.cpp
   test/smru_dict.cpp
 )

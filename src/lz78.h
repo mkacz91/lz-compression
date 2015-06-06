@@ -53,13 +53,21 @@ Buffer Lz78<Dict>::encode (Buffer const& input) const {
                 ahead = 0;
             }
         }
-        // Behave as if a special terminating char was present.
-        Match match = dict.fail_char();
-        writer.put(match.codeword_no, m_codeword_no_length);
-        if (match.length != ahead) {
-            writer.put(match.extending_char, CHAR_LENGTH);
-            reader.put_back(ahead - match.length);
-            ahead = 0;
+        if (ahead != 0) {
+            // We reached the end of input but still have some partially matched
+            // prefix. Behave as if a special terminating char was present.
+            Match match = dict.fail_char();
+            writer.put(match.codeword_no, m_codeword_no_length);
+            if (match.length != ahead) {
+                // The match terminates before the end of input, i.e.,
+                // `match.extending_char` is some valid char. We write it and
+                // prepare for another round.
+                writer.put(match.extending_char, CHAR_LENGTH);
+                // No `- 1` here cause `ahead` wasn't incremented on
+                // `fail_char()`.
+                reader.put_back(ahead - match.length);
+                ahead = 0;
+            }
         }
     }
 
@@ -73,7 +81,7 @@ Buffer Lz78<Dict>::decode (Buffer const& output) const {
     BufferCharWriter writer(input);
     BufferBitReader reader(output);
 
-    // Starting position of the part not yet decoded.
+    // Starting position of the part not decoded yet.
     int pos = 0;
     while (!reader.eob()) {
         int i = reader.get(m_codeword_no_length);

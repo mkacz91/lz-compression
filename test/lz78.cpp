@@ -10,17 +10,11 @@ protected:
     Buffer output;
 
     SmruLz78Test ();
-
-    virtual void SetUp ();
 };
 
 SmruLz78Test::SmruLz78Test () :
     lz78(3)
 {
-    /* Do nothing */
-}
-
-void SmruLz78Test::SetUp () {
     int const codeword_no_length = 2;
 
     BufferCharWriter iwriter(input);
