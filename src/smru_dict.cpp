@@ -27,7 +27,7 @@ void SmruDictBase::make_permanent (int i) {
 }
 
 int SmruDictBase::match (int i) {
-    assert(0 <= i && i <= m_queue.size());
+    assert(0 <= i && i <= size());
 
     // If a codeword is used, its prefixes are considered used more recently.
     // The traversal stops when a permanent codeword is reached.
@@ -37,17 +37,17 @@ int SmruDictBase::match (int i) {
         m_queue_positions[j] = --m_queue.end();
     }
 
-    // If the limit has not been reached, make a fresh codeword. Otherwise,
-    // utilize the least recently used codeword.
-    int j;
-    if (m_queue.size() < m_limit) {
-        j = m_queue.size() + 1;
+    // Try to make a fresh codeword.
+    int j = fresh_codeword_no();
+    if (j != 0) {
         // The values below will be overwritten in the upcoming instructions
         // but that's ok. It removes some redundancy in the follow up code.
         m_queue.push_front(j);
         m_parents.push_back(i);
         m_queue_positions.push_back(m_queue.begin());
     } else {
+        // The limit has been reached. Utilize the least recently used
+        // codeword.
         j = m_queue.front();
     }
 

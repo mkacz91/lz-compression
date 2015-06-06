@@ -20,6 +20,10 @@ public:
     // to `0`.
     explicit DictBase (int limit);
 
+    // Returns the number of codewords stored in the dictionary. Always
+    // `<= limit()`.
+    int size () const;
+    
     // Returns the upper bound for the number of codewords. Always 0 for
     // unlimited dictionaries.
     int limit () const;
@@ -31,17 +35,36 @@ public:
 protected:
     // The upper bound for the number of codewords. Irrelevant in unlimited
     // dictionaries and equal to 0.
-    int m_limit;
+    int const m_limit;
+    
+    // Returns a fresh codeword number, effectively increasing the size of the
+    // dictionary by one. If the limit has been reached before calling this
+    // method, the result is 0 and the size is not increased.
+    int fresh_codeword_no ();
+    
+private:
+    // Number of codewords stored in the dictionary. Derived classes should
+    // update it using `fresh_codeword_no()`.
+    int m_size;
 };
 
 inline DictBase::DictBase (int limit) :
-    m_limit(limit)
+    m_limit(limit),
+    m_size(0)
 {
     assert(limit >= 0);
 }
 
+inline int DictBase::size() const {
+    return m_size;
+}
+
 inline int DictBase::limit () const {
     return m_limit;
+}
+
+inline int DictBase::fresh_codeword_no () {
+    return m_size < m_limit ? ++m_size : 0;
 }
 
 // Match

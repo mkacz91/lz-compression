@@ -56,5 +56,5 @@ TEST_F (SmruLzwTest, Encoding) {
 }
 
 TEST_F (SmruLzwTest, Decoding) {
-    //ASSERT_EQ(input, lzw.decode(output));
+    ASSERT_EQ(input, lzw.decode(output));
 }
