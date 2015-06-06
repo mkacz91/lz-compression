@@ -1,6 +1,7 @@
 build
 xcode
 docs
+.atom-build.json
 
 ###############################################################################
 # Copied from gitignore/Global/OSX.gitignore

@@ -37,7 +37,7 @@ public:
 
     // This method handles the situation when the longest matching codeword is
     // found. It takes the number `i` of the longest matching codeword. Then it
-    // moves `i` and all of it's prefixes to the front of the MRU queue and
+    // moves `i` and all of it's prefixes to the back of the discard queue and
     // returns the number of the new codeword, which is the extension of `i`.
     //
     // If the number of codewords would exceed the limit, the new codeword
@@ -49,13 +49,13 @@ public:
     int match (int i);
 
 private:
-    // The MRU queue. The most recently used codewords are in the front.
+    // The discard queue. The elements are ordered with respect to time of use, // the least recently used codewords being in the front.
     std::list<int> m_queue;
 
     // The indices of codeword parents.
     std::vector<int> m_parents;
 
-    // The positions of codewords within the MRU queue.
+    // The positions of codewords within the discard queue.
     std::vector<std::list<int>::iterator> m_queue_positions;
 };
 

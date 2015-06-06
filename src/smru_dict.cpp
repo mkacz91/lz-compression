@@ -17,7 +17,7 @@ SmruDictBase::SmruDictBase (int limit) :
 }
 
 void SmruDictBase::make_permanent (int i) {
-    // A permanent codeword is recognized with
+    // A permanent codeword is recognized as being used after all other, namely
     // `m_queue_positions[i] == m_queue.end()`. To ensure further integrity,
     // all prefixes of `i` must also be marked permanent.
     for (int j = i; m_queue_positions[j] != m_queue.end(); j = m_parents[j]) {
@@ -29,13 +29,12 @@ void SmruDictBase::make_permanent (int i) {
 int SmruDictBase::match (int i) {
     assert(0 <= i && i <= m_queue.size());
 
-    // If a codeword is used, its prefixes are considered used later. The
-    // traversal stops when a permanent codeword is reached, which is indicated
-    // by `m_queue_positions[j] == m_queue.end()`.
+    // If a codeword is used, its prefixes are considered used more recently.
+    // The traversal stops when a permanent codeword is reached.
     for (int j = i; m_queue_positions[j] != m_queue.end(); j = m_parents[j]) {
         m_queue.erase(m_queue_positions[j]);
-        m_queue.push_front(j);
-        m_queue_positions[j] = m_queue.begin();
+        m_queue.push_back(j);
+        m_queue_positions[j] = --m_queue.end();
     }
 
     // If the limit has not been reached, make a fresh codeword. Otherwise,
@@ -45,11 +44,11 @@ int SmruDictBase::match (int i) {
         j = m_queue.size() + 1;
         // The values below will be overwritten in the upcoming instructions
         // but that's ok. It removes some redundancy in the follow up code.
-        m_queue.push_back(j);
+        m_queue.push_front(j);
         m_parents.push_back(i);
-        m_queue_positions.push_back(--m_queue.end());
+        m_queue_positions.push_back(m_queue.begin());
     } else {
-        j = m_queue.back();
+        j = m_queue.front();
     }
 
     // Don't permit codewords longer than the limit. Such situation is
@@ -58,11 +57,10 @@ int SmruDictBase::match (int i) {
     if (i != j) {
         m_queue.erase(m_queue_positions[j]);
         if (i == 0) {
-            m_queue.push_front(j);
-            m_queue_positions[j] = m_queue.begin();
+            m_queue.push_back(j);
+            m_queue_positions[j] = --m_queue.end();
         } else {
-            std::list<int>::iterator pos = m_queue_positions[i];
-            m_queue_positions[j] = m_queue.insert(++pos, j);
+            m_queue_positions[j] = m_queue.insert(m_queue_positions[i], j);
         }
         m_parents[j] = i;
         return j;
