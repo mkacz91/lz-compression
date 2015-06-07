@@ -32,6 +32,7 @@ set(LZC_TEST_HEADERS
 set(LZC_TEST_SOURCES
   test/buffer.cpp
   test/encode_dict_node.cpp
+  test/encoding_decoding.cpp
   test/lz78.cpp
   test/lzw.cpp
   test/main.cpp
