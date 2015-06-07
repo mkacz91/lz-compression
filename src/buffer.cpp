@@ -9,12 +9,12 @@ Buffer::Buffer () :
     push_back(NULL_WORD);
 }
 
-Buffer::Buffer (Buffer&& buffer) :
-    m_capacity(buffer.m_capacity),
-    m_open_word_cnt(buffer.m_open_word_cnt),
-    m_size(buffer.m_size)
+Buffer::Buffer (Buffer&& buffer)
 {
     swap(m_data, buffer.m_data);
+    swap(m_capacity, buffer.m_capacity);
+    swap(m_open_word_cnt, buffer.m_open_word_cnt);
+    swap(m_size, buffer.m_size);
 }
 
 Buffer::~Buffer () {

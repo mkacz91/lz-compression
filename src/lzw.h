@@ -58,8 +58,8 @@ Buffer Lzw<Dict>::encode (Buffer const& input) const {
             if (match.is_maximal()) {
                 // Only the matching codeword number is written.
                 writer.put(match.codeword_no, m_codeword_no_length);
-                // Notice the `- 2`.
-                reader.put_back(ahead - match.length - 2);
+                // We put back all chars up to the first unmatched one inclusive.
+                reader.put_back(ahead - match.length);
                 ahead = 0;
             }
         }
@@ -70,9 +70,9 @@ Buffer Lzw<Dict>::encode (Buffer const& input) const {
             writer.put(match.codeword_no, m_codeword_no_length);
             if (match.length != ahead) {
                 // The match terminates before the end of input. We have to
-                // prepare for another round. It's `- 1` instead of `- 2` cause
-                // `ahead` wasn't incremented on `fail_char()`.
-                reader.put_back(ahead - match.length - 1);
+                // prepare for another round. It's `+ 1` cause ahead` wasn't
+                // incremented on `fail_char()`.
+                reader.put_back(ahead - match.length + 1);
                 ahead = 0;
             }
         }

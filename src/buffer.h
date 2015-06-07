@@ -78,7 +78,7 @@ public:
     //
     // **Warning:** The reader is valid only for as long as `buffer` is not
     // altered.
-    BufferBitReader (Buffer const& buffer);
+    explicit BufferBitReader (Buffer const& buffer);
 
     // Rteurns the next `bit_cnt` bits of the buffer and advances the read
     // position.
@@ -143,7 +143,7 @@ public:
     //
     // **Warning:** The reader is valid only for as long as `buffer` is not
     // altered.
-    BufferCharReader (Buffer const& buffer);
+    explicit BufferCharReader (Buffer const& buffer);
 
     // Returns the next char from the attached buffer.
     char get ();
@@ -223,7 +223,7 @@ inline BufferCharSlice::BufferCharSlice (
 class BufferCharWriter {
 public:
     // Constructs a char writer attached to given buffer.
-    BufferCharWriter (Buffer& buffer);
+    explicit BufferCharWriter (Buffer& buffer);
 
     // Appends a char to the buffer.
     void put (char data);
