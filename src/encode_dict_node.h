@@ -7,7 +7,7 @@
 
 // EncodeDictNode
 // =============================================================================
-// 
+//
 // A word-tree node for use in LZ78/LZW dictionary implementation during
 // encoding.
 //
@@ -19,7 +19,7 @@ public:
     typedef ChildMap::iterator iterator;
 
     // Constructs a node with given codeword number. It is impossible to
-    // alter the codeword number afterwards. Negative numbers are treated as 0.
+    // alter the codeword number afterwards.
     explicit EncodeDictNode (int codeword_no);
 
     // Returns the parent node. The result is `nullptr` in case of root.
@@ -48,17 +48,8 @@ public:
     // Returns `true` if the node is a leaf, i.e., has no children.
     bool is_leaf () const;
 
-    // Returns the number of the corresponding codeword. Not valid for inactive
-    // nodes.
+    // Returns the number of the corresponding codeword.
     int codeword_no () const;
-
-    // Returns `true` if the node is active. This property is not necessarily
-    // used by all dictionary. implementations.
-    bool is_active () const;
-
-    // Makes the node inactive. An inactive node cannot be returned to the
-    // active state. Shouldn't be called on a root node.
-    void deactivate ();
 
 private:
 
@@ -79,9 +70,9 @@ private:
 
 inline EncodeDictNode::EncodeDictNode (int codeword_no)
     : m_parent(nullptr)
-    , m_codeword_no(max(0, codeword_no))
+    , m_codeword_no(codeword_no)
 {
-    /* Do nothing */
+    assert(codeword_no >= 0);
 }
 
 inline EncodeDictNode* EncodeDictNode::parent () {
@@ -123,17 +114,7 @@ inline bool EncodeDictNode::is_root () const {
 }
 
 inline int EncodeDictNode::codeword_no () const {
-    assert(this->is_active());
     return m_codeword_no;
-}
-
-inline bool EncodeDictNode::is_active () const {
-    return m_codeword_no != -1;
-}
-
-inline void EncodeDictNode::deactivate () {
-    assert(!this->is_root());
-    m_codeword_no = -1;
 }
 
 #endif // ENCODE_DICT_NODE_H
