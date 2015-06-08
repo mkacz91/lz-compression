@@ -6,7 +6,7 @@
 #include <vector>
 
 #include "dict_base.h"
-#include "encode_dict_node.h"
+#include "label_tree_node.h"
 
 // SmruDictBase
 // =============================================================================
@@ -76,7 +76,10 @@ public:
     virtual Match fail_char ();
 
 private:
-    typedef EncodeDictNode Node;
+    // The trie used to efficiently retrieve codeword matchings consists of
+    // nodes labelled with codeword numbers and edges labelled with single
+    // characters.
+    typedef LabelTreeNode<int, char> Node;
 
     // The node pool. We allocate all nodes at once. The first element is the
     // the root.

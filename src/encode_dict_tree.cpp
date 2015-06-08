@@ -125,7 +125,7 @@ void EncodeDictTree::remove (int i) {
 // =============================================================================
 
 inline EncodeDictTree::Node::Node (int codeword_no, int begin) :
-    EncodeDictNode(codeword_no),
+    LabelTreeNode(codeword_no),
     active(true),
     begin(begin),
 {

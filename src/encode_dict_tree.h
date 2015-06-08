@@ -21,7 +21,7 @@ public:
     // There are two possible scenarios depending on the value of `j`:
     //
     //   * If `j` is an index of an already exisiting node, that node gets
-    //     discarded in favour og the new one.
+    //     discarded in favour of the new one.
     //
     //   * If `j` is equal to the number of codewords plus one, a fresh codeword
     //     is allocated.
@@ -37,10 +37,10 @@ public:
     Codeword const& codeword (int i) const;
 
 private:
-    // The tree node. Extends `EncodeDictNode` with information about active
+    // The tree node. Extends `LabelTreeNode` with information about active
     // state and the starting position of the corresponding word within the
     // input buffer.
-    class Node : public EncodeDictNode {
+    class Node : public LabelTreeNode {
     public:
         bool active;
         int begin;
@@ -66,7 +66,7 @@ private:
     void remove (int i);
 };
 
-inline BufferCharSlice EncodeDictNode::edge (int i, char a) {
+inline BufferCharSlice LabelTreeNode::edge (int i, char a) {
     Node* node = m_nodes[i];
     Node* child = node->child(a);
     int begin = m_codewords[]

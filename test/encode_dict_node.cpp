@@ -1,21 +1,18 @@
 #include "prefix.h"
 
-#include "../src/encode_dict_node.h"
+#include "../src/label_tree_node.h"
 
-TEST (EncodeDictNodeTest, Initialization) {
-    EncodeDictNode node1(5);
-    EXPECT_EQ(nullptr, node1.parent());
-    EXPECT_EQ(0, node1.child_cnt());
-    EXPECT_EQ(5, node1.codeword_no);
-
-    EncodeDictNode node2(0);
-    EXPECT_EQ(0, node2.codeword_no);
+TEST (LabelTreeNodeTest, Initialization) {
+    LabelTreeNode<int, char> node(5);
+    EXPECT_EQ(nullptr, node.parent());
+    EXPECT_EQ(0, node.child_cnt());
+    EXPECT_EQ(5, node.label);
 }
 
-TEST (EncodeDictNodeTest, Linking) {
-    EncodeDictNode root(0);
-    EncodeDictNode node1(1);
-    EncodeDictNode node2(2);
+TEST (LabelTreeNodeTest, Linking) {
+    LabelTreeNode<int, char> root(0);
+    LabelTreeNode<int, char> node1(1);
+    LabelTreeNode<int, char> node2(2);
 
     root.link_child('a', &node1);
     EXPECT_EQ(1, root.child_cnt());
