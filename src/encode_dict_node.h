@@ -18,15 +18,17 @@ public:
     typedef std::unordered_map<char, EncodeDictNode*> ChildMap;
     typedef ChildMap::iterator iterator;
 
-    // Constructs a node with given codeword number. It is impossible to
-    // alter the codeword number afterwards.
-    explicit EncodeDictNode (int codeword_no);
+    // Number of the corresponding codeword.
+    int codeword_no;
+
+    // Constructs a node with given codeword number, which defaults to 0.
+    explicit EncodeDictNode (int codeword_no = 0);
 
     // Returns the parent node. The result is `nullptr` in case of root.
     EncodeDictNode* parent ();
 
-    // Returns the node pointed to by an edge with label starting with `a`.
-    // The result is `nullptr` if there is no such edge.
+    // Returns the node pointed to by an edge labelled `a`, or `nullptr` if no
+    // such edge exists.
     EncodeDictNode* child (char a);
 
     // Returns the iterator pointing to the first child.
@@ -35,9 +37,18 @@ public:
     // Returns the iterator pointing right past the last child.
     iterator end ();
 
-    // Link a child node along an edge with label starting with `a`. Detaching
-    // a child is only possible through linking it to another parent.
+    // Link a child node along an edge with label starting with `a`. Can be
+    // called only if this node does not have any child along the same edge. If
+    // necessary, `node` is detached from whatever parent it was already linked
+    // to.
     void link_child (char a, EncodeDictNode* node);
+
+    // Unlinks the node from parent. Has no effect on root nodes.
+    void unlink ();
+
+    // Returns the label of the edge that connects this node with its parent.
+    // Invalid for root nodes.
+    char link_char () const;
 
     // Gets the number of children.
     int child_cnt () const;
@@ -48,29 +59,22 @@ public:
     // Returns `true` if the node is a leaf, i.e., has no children.
     bool is_leaf () const;
 
-    // Returns the number of the corresponding codeword.
-    int codeword_no () const;
-
 private:
-
     // The parent node. No parent is indicated with `nullptr`.
     EncodeDictNode* m_parent;
 
-    // The letter along which the node is linked to its parent. Undefined for
-    // unlinked nodes.
-    char m_link_char;
-
     // The hashmap of children nodes. Each entry represents an edge, the key
-    // being the first letter of the edge label.
+    // being the edge label.
     ChildMap m_children;
 
-    // The number of the corresponding codeword.
-    int m_codeword_no;
+    // Position of this node within the parent's children map. Undefined for
+    // root nodes.
+    iterator m_children_pos;
 };
 
 inline EncodeDictNode::EncodeDictNode (int codeword_no)
     : m_parent(nullptr)
-    , m_codeword_no(codeword_no)
+    , codeword_no(codeword_no)
 {
     assert(codeword_no >= 0);
 }
@@ -95,10 +99,22 @@ inline EncodeDictNode::iterator EncodeDictNode::end () {
 inline void EncodeDictNode::link_child (char a, EncodeDictNode* node) {
     assert(m_children.count(a) == 0);
     if (node->m_parent != nullptr)
-        node->m_parent->m_children.erase(node->m_link_char);
+        node->m_parent->m_children.erase(node->m_children_pos);
     node->m_parent = this;
     node->m_link_char = a;
     m_children[a] = node;
+}
+
+inline void EncodeDictNode::unlink () {
+    if (m_parent != nullptr) {
+        m_parent->m_children.erase(m_children_pos);
+        m_parent = nullptr;
+    }
+}
+
+inline char EncodeDictNode::link_char () const {
+    assert(!is_root())
+    return m_children_pos->first;
 }
 
 inline int EncodeDictNode::child_cnt () const {
@@ -111,10 +127,6 @@ inline bool EncodeDictNode::is_leaf () const {
 
 inline bool EncodeDictNode::is_root () const {
     return m_parent == nullptr;
-}
-
-inline int EncodeDictNode::codeword_no () const {
-    return m_codeword_no;
 }
 
 #endif // ENCODE_DICT_NODE_H
