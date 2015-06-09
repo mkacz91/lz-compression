@@ -1,18 +1,18 @@
 #include "prefix.h"
 
-#include "../src/label_tree_node.h"
+#include "../src/word_tree_node.h"
 
-TEST (LabelTreeNodeTest, Initialization) {
-    LabelTreeNode<int, char> node(5);
+TEST (WordTreeNodeTest, Initialization) {
+    WordTreeNode<int> node(5);
     EXPECT_EQ(nullptr, node.parent());
     EXPECT_EQ(0, node.child_cnt());
-    EXPECT_EQ(5, node.label);
+    EXPECT_EQ(5, node.tag);
 }
 
-TEST (LabelTreeNodeTest, Linking) {
-    LabelTreeNode<int, char> root(0);
-    LabelTreeNode<int, char> node1(1);
-    LabelTreeNode<int, char> node2(2);
+TEST (WordTreeNodeTest, Linking) {
+    WordTreeNode<int> root(0);
+    WordTreeNode<int> node1(1);
+    WordTreeNode<int> node2(2);
 
     root.link_child('a', &node1);
     EXPECT_EQ(1, root.child_cnt());

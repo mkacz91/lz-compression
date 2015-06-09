@@ -97,7 +97,7 @@ SmruDecodeDict::SmruDecodeDict (int limit) :
 }
 
 Match SmruEncodeDict::try_char (char a) {
-    int i = m_node->label;
+    int i = m_node->tag;
     Node* next_node = m_node->child(a);
     if (next_node != nullptr) {
         // Still matching. This is not necessarily a maximal match.
@@ -120,7 +120,7 @@ Match SmruEncodeDict::try_char (char a) {
 }
 
 Match SmruEncodeDict::fail_char () {
-    int i = m_node->label;
+    int i = m_node->tag;
     // New search starts at root.
     m_node = &m_nodes.front();
     return Match(i, m_match_length, '\0'); // The extending char is irrelevant.

@@ -2,6 +2,6 @@
 
 #include "../src/encode_dict_tree.h"
 
-TEST (EncodeDictTreeTest, Extending) {
-    EncodeDictTreeTest
+TEST (PoolDictBaseTest, Extending) {
+    PoolDictBaseTest
 }
