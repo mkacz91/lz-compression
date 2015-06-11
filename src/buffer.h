@@ -89,7 +89,7 @@ public:
 
 private:
     // The data array of the attached buffer.
-    word const* const m_data;
+    word const* m_data;
 
     // Number of words left to read.
     int m_left;
@@ -156,10 +156,10 @@ public:
 
 private:
     // The data array of the attached buffer.
-    char const* const m_data;
+    char const* m_data;
 
     // Number of characters stored in `m_data`.
-    int const m_char_cnt;
+    int m_char_cnt;
 
     // Index of the current char within `m_data` to be read from on a call to
     // `get()`. Cannot exceed `m_char_cnt`.
@@ -186,6 +186,9 @@ inline bool BufferCharReader::eob () const {
 // A slice of buffer data interpreted with char resolution.
 class BufferCharSlice {
 public:
+    // Constructs an empty slice
+    BufferCharSlice ();
+
     // Constructs a new slice of given length, starting at char with index
     // `begin` and ending. Providing `length <= 0` results in an empty slice.
     //
@@ -193,16 +196,38 @@ public:
     // altered.
     BufferCharSlice (Buffer const& buffer, int begin, int length);
 
+    // Returns length of the slice.
+    int length () const;
+
+    // Retrieves the `i`th character of the slice.
+    char operator [] (int i) const;
+
 private:
     // Starting address of the slice. This points directly into the `m_data`
     // array of the origin buffer.
-    char const* const m_begin;
+    char const* m_begin;
 
     // Length of the slice (in chars).
-    int const m_length;
+    int m_length;
 
     friend class BufferCharWriter;
+    friend bool operator == (
+        BufferCharSlice const& slice1,
+        BufferCharSlice const& slice2
+    );
+    friend bool operator == (string const& s, BufferCharSlice const& slice);
+    friend std::ostream& operator << (
+        std::ostream& ostr,
+        BufferCharSlice const& slice
+    );
 };
+
+inline BufferCharSlice::BufferCharSlice () :
+    m_begin(nullptr),
+    m_length(0)
+{
+    /* Do nothing. */
+}
 
 inline BufferCharSlice::BufferCharSlice (
     Buffer const& buffer,
@@ -214,6 +239,36 @@ inline BufferCharSlice::BufferCharSlice (
 {
     assert(begin < buffer.m_size / CHAR_LENGTH || m_length == 0);
     assert(begin + m_length <= buffer.m_size / CHAR_LENGTH);
+}
+
+inline int BufferCharSlice::length () const {
+    return m_length;
+}
+
+inline char BufferCharSlice::operator [] (int i) const {
+    assert(0 <= i && i < m_length);
+    return m_begin[i];
+}
+
+inline bool
+operator == (BufferCharSlice const& slice1, BufferCharSlice const& slice2) {
+    return
+        slice1.m_length == slice2.m_length &&
+        equal(
+            slice1.m_begin,
+            slice1.m_begin + slice1.m_length,
+            slice2.m_begin
+        );
+}
+
+inline bool operator == (string const& s, BufferCharSlice const& slice) {
+    return slice.m_length == s.size()
+        && equal(s.begin(), s.end(), slice.m_begin);
+}
+
+inline std::ostream&
+operator << (std::ostream& ostr, BufferCharSlice const& slice) {
+    return ostr << string(slice.m_begin, slice.m_length);
 }
 
 // BufferCharWriter

@@ -24,6 +24,7 @@ int const CHAR_CNT = 256;
 using std::min;
 using std::max;
 using std::copy;
+using std::equal;
 
 #include <utility>
 using std::swap;

@@ -45,6 +45,9 @@ public:
     // Unlinks the node from parent. Has no effect on root nodes.
     void unlink ();
 
+    // Returns the label of edge pointing to parent. Invalid for root nodes.
+    char link_char () const;
+
     // Gets the number of children.
     int child_cnt () const;
 
@@ -112,6 +115,12 @@ inline void WordTreeNode<T>::unlink () {
         m_parent->m_children.erase(m_children_pos);
         m_parent = nullptr;
     }
+}
+
+template <typename T>
+inline char WordTreeNode<T>::link_char () const {
+    assert(m_parent != nullptr);
+    return m_children_pos->first;
 }
 
 template <typename T>
