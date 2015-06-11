@@ -147,6 +147,10 @@ protected:
     // TODO doc
     char get_char ();
 
+    // Returns the index of the last char read from the buffer. Before anything
+    // is read, the result is `-1`.
+    int pos () const;
+
 private:
     // TODO doc
     BufferCharReader m_reader;
@@ -168,6 +172,10 @@ inline bool EncodeDict::eob () const {
 
 inline char EncodeDict::get_char () {
     return m_reader.get();
+}
+
+inline int EncodeDict::pos () const {
+    return m_reader.pos();
 }
 
 // Codeword

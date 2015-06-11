@@ -154,6 +154,10 @@ public:
     // Returns `true` if there is no more data to read.
     bool eob () const;
 
+    // Return the index of the last character read from buffer. Before anything
+    // is read, the result is `-1`.
+    int pos () const;
+
 private:
     // The data array of the attached buffer.
     char const* m_data;
@@ -178,6 +182,10 @@ inline void BufferCharReader::put_back (int char_cnt) {
 
 inline bool BufferCharReader::eob () const {
     return m_pos >= m_char_cnt;
+}
+
+inline int BufferCharReader::pos () const {
+    return m_pos - 1;
 }
 
 // BufferCharSlice

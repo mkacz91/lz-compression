@@ -10,7 +10,9 @@ set(LZC_HEADERS
   src/lz.h
   src/lz78.h
   src/lzw.h
+  src/mra_dict.h
   src/pool_dict_tree.h
+  src/pool_dict.h
   src/prefix.h
   src/smru_dict.h
 )
@@ -37,6 +39,7 @@ set(LZC_TEST_SOURCES
   test/lz78.cpp
   test/lzw.cpp
   test/main.cpp
+  test/mra_dict.cpp
   test/pool_dict_tree.cpp
   test/smru_dict.cpp
   test/word_tree_node.cpp

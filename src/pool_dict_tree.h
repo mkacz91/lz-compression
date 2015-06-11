@@ -34,10 +34,10 @@ public:
 
         int length () const;
 
+        char operator [] (int i) const;
+
     private:
         BufferCharSlice m_slice;
-
-        Edge ();
 
         Edge (Node const* dst, BufferCharSlice const& slice);
 
@@ -88,9 +88,8 @@ private:
     // An array mapping codeword indices to tree nodes.
     std::vector<Node*> m_nodes;
 
-    // Removes the `i`th codeword from the tree. Not exposed publicly in order
-    // to enforce coniguous codeword range. Implicitly called by `extend()`.
-    void remove (int i);
+    // Removes a node from the tree. Implicitly called by `extend()`.
+    void remove (Node* node);
 
     // TODO doc
     BufferCharSlice slice (int begin, int length) const;
@@ -127,6 +126,10 @@ operator == (PoolDictTree::Tag const& tag1, PoolDictTree::Tag const& tag2) {
 
 inline int PoolDictTree::Edge::length () const {
     return m_slice.length();
+}
+
+inline char PoolDictTree::Edge::operator [] (int i) const {
+    return m_slice[i];
 }
 
 inline bool operator == (

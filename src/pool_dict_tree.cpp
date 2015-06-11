@@ -32,11 +32,12 @@ PoolDictTree::~PoolDictTree () {
 void PoolDictTree::extend (int i, int begin, int j) {
     assert(0 <= i && i <  m_nodes.size());
     assert(0 <  j && j <= m_nodes.size());
-
+    
+    Node* to_remove = nullptr;
     if (j == m_nodes.size()) {
         m_nodes.push_back(nullptr);
     } else {
-        remove(j);
+        to_remove = m_nodes[j];
     }
 
     // The node which will become the parent of the new node.
@@ -82,6 +83,9 @@ void PoolDictTree::extend (int i, int begin, int j) {
         lower->tag = Tag(true, j, begin, length);
         m_nodes[j] = lower;
     }
+    
+    if (to_remove != nullptr)
+        remove(to_remove);
 }
 
 PoolDictTree::Edge PoolDictTree::edge (Node const* node, char a) const {
@@ -91,7 +95,7 @@ PoolDictTree::Edge PoolDictTree::edge (Node const* node, char a) const {
 
     Node* child = const_cast<Node*>(node)->child(a);
     if (child == nullptr) {
-        return Edge();
+        return edge_to_root();
     } else {
         int begin = child->tag.begin + node->tag.length;
         int length = child->tag.length - node->tag.length;
@@ -99,9 +103,7 @@ PoolDictTree::Edge PoolDictTree::edge (Node const* node, char a) const {
     }
 }
 
-void PoolDictTree::remove (int i) {
-    assert(0 < i && i < m_nodes.size());
-    Node* node = m_nodes[i];
+void PoolDictTree::remove (Node* node) {
     assert(node != nullptr);
     assert(node->tag.active);
     assert(!node->is_root());
@@ -134,8 +136,6 @@ void PoolDictTree::remove (int i) {
         // We deal with a forking node. It suffices to just mark it as inactive.
         node->tag.active = false;
     }
-
-    m_nodes[i] = nullptr;
 }
 
 inline BufferCharSlice PoolDictTree::slice (int begin, int length) const {
@@ -146,12 +146,6 @@ inline BufferCharSlice PoolDictTree::slice (int begin, int length) const {
 
 // PoolDictTree::Edge
 // =============================================================================
-
-inline PoolDictTree::Edge::Edge () :
-    dst(nullptr)
-{
-    /* Do nothing. */
-}
 
 inline
 PoolDictTree::Edge::Edge (Node const* dst, BufferCharSlice const& slice) :
