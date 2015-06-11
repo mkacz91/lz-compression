@@ -30,6 +30,8 @@ using std::swap;
 using std::pair;
 using std::make_pair;
 
+#define UNUSED(var) (void)(var)
+
 inline word lshift (word x, int n) {
     if (n >= WORD_LENGTH)
         return NULL_WORD;

@@ -70,8 +70,8 @@ private:
 template <typename T>
 template <typename... Args>
 inline WordTreeNode<T>::WordTreeNode (Args const&... args) :
-    m_parent(nullptr),
-    tag(args...)
+    tag(args...),
+    m_parent(nullptr)
 {
     /* Do nothing. */
 }

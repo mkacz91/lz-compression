@@ -48,8 +48,8 @@ void EncodeDecodeTest<Lz>::init_lorem_ipsum () {
 }
 
 typedef testing::Types<
-    Lz78<SmruDict>,
-    Lzw<SmruDict>
+    Lz78<SmruDictPair>,
+    Lzw<SmruDictPair>
 > algos;
 TYPED_TEST_CASE(EncodeDecodeTest, algos);
 

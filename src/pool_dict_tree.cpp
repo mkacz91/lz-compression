@@ -2,10 +2,10 @@
 
 #include <queue>
 
-// EncodeDictTree
+// PoolDictBase
 // =============================================================================
 
-EncodeDictTree::EncodeDictTree (Buffer const& input) :
+PoolDictBase::PoolDictBase (Buffer const& input) :
     m_input(input),
     m_root(new Node),
     m_codewords(1, Codeword(0, 0)),
@@ -14,7 +14,7 @@ EncodeDictTree::EncodeDictTree (Buffer const& input) :
     /* Do nothing */
 }
 
-EncodeDictTree::~EncodeDictTree () {
+PoolDictBase::~PoolDictBase () {
     // All nodes are allocated on heap.
     std::queue<Node*> queue;
     queue.push(m_root);
@@ -27,7 +27,7 @@ EncodeDictTree::~EncodeDictTree () {
     }
 }
 
-void EncodeDictTree::extend (int i, int begin, int j) {
+void PoolDictBase::extend (int i, int begin, int j) {
     assert(0 <= i && i <  m_codewords.size());
     assert(0 <  j && j <= m_codewords.size());
 
@@ -84,7 +84,7 @@ void EncodeDictTree::extend (int i, int begin, int j) {
     }
 }
 
-void EncodeDictTree::remove (int i) {
+void PoolDictBase::remove (int i) {
     assert(0 < i && i < m_codewords.size());
     Node* node = m_nodes[i];
     assert(node != nullptr);
@@ -121,11 +121,11 @@ void EncodeDictTree::remove (int i) {
     }
 }
 
-// EncodeDictTree::Node
+// PoolDictBase::Node
 // =============================================================================
 
-inline EncodeDictTree::Node::Node (int codeword_no, int begin) :
-    LabelTreeNode(codeword_no),
+inline PoolDictBase::Node::Node (int codeword_no, int begin) :
+    WordTreeNode(codeword_no),
     active(true),
     begin(begin),
 {

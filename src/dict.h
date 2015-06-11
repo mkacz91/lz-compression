@@ -1,7 +1,9 @@
-#ifndef DICT_BASE_H
-#define DICT_BASE_H
+#ifndef DICT_H
+#define DICT_H
 
 #include "prefix.h"
+
+#include "buffer.h"
 
 // **Note:** The classes defined here do not serve the purpose of making it
 // possible to use dictionaries in a polymorphic way (they are intended to be
@@ -9,62 +11,39 @@
 // They exist rather to impose interface and provide a place for common
 // documentation.
 
-// DictBase
+// Dict
 // =============================================================================
 //
 // Base class for all ditionaries to be used by LZ78/LZW encoders/decoders.
-class DictBase {
+class Dict {
 public:
     // Creates an empty dictionary with given limit, which is the upper bound
     // for the number of codewords. Unlimited dictionaries should set `limit`
     // to `0`.
-    explicit DictBase (int limit);
+    // TODO
+    Dict (int limit, bool single_char_codewords);
 
-    // Returns the number of codewords stored in the dictionary. Always
-    // `<= limit()`.
-    int size () const;
-    
     // Returns the upper bound for the number of codewords. Always 0 for
     // unlimited dictionaries.
     int limit () const;
-
-    // Marks the codeword with number `i` as permanent. Limited dictionaries
-    // are forbidden to remove such codewords.
-    virtual void make_permanent (int i) = 0;
 
 protected:
     // The upper bound for the number of codewords. Irrelevant in unlimited
     // dictionaries and equal to 0.
     int const m_limit;
-    
-    // Returns a fresh codeword number, effectively increasing the size of the
-    // dictionary by one. If the limit has been reached before calling this
-    // method, the result is 0 and the size is not increased.
-    int fresh_codeword_no ();
-    
-private:
-    // Number of codewords stored in the dictionary. Derived classes should
-    // update it using `fresh_codeword_no()`.
-    int m_size;
 };
 
-inline DictBase::DictBase (int limit) :
-    m_limit(limit),
-    m_size(0)
+inline Dict::Dict (int limit, bool single_char_codewords) :
+    m_limit(limit)
 {
+    // The argument `single_char_codewords` is present only to bring to mind
+    // that such ffeature must be implemented in base class.
+    UNUSED(single_char_codewords);
     assert(limit >= 0);
 }
 
-inline int DictBase::size() const {
-    return m_size;
-}
-
-inline int DictBase::limit () const {
+inline int Dict::limit () const {
     return m_limit;
-}
-
-inline int DictBase::fresh_codeword_no () {
-    return m_size < m_limit ? ++m_size : 0;
 }
 
 // Match
@@ -79,23 +58,29 @@ inline int DictBase::fresh_codeword_no () {
 // found and therefore no new codeword is created. For that purpose, a special,
 // otherwise invalid, value is permitted, namely `codeword_no = -1`. The other
 // fields are unspecified in such case.
+// TODO
 struct Match {
     int codeword_no;
     int length;
     char extending_char;
 
-    // Constructs a new match with given codeword number and length.
-    Match (int codeword_no, int length, char extending_char);
-
-    // Constructs a non-maximal match.
+    // Constructs a non-maximal match
     Match ();
 
-    // Returns `true` if this is a maximal match.
+    // Constructs a maximal match.
+    Match (int codeword_no, int length, char extending_char);
+
     bool is_maximal () const;
 
-    // Retuns `true` if `match` is equal to this match.
     bool operator == (Match const& match) const;
 };
+
+inline Match::Match () :
+    // Other values undefined.
+    codeword_no(-1)
+{
+    /* Do nothing */
+}
 
 inline Match::Match (int codeword_no, int length, char extending_char) :
     codeword_no(codeword_no),
@@ -105,33 +90,34 @@ inline Match::Match (int codeword_no, int length, char extending_char) :
     assert(codeword_no >= 0 && length >= 0);
 }
 
-inline Match::Match () :
-    // Other values undefined.
-    codeword_no(-1)
-{
-    /* Do nothing */
-}
-
 inline bool Match::is_maximal () const {
     return codeword_no != -1;
 }
 
 inline bool Match::operator == (Match const& match) const {
-    return codeword_no == match.codeword_no
-        && length == match.length
-        && extending_char == match.extending_char;
+    return (
+            !this->is_maximal() &&
+            !match.is_maximal()
+        ) || (
+            codeword_no == match.codeword_no &&
+            length == match.length &&
+            extending_char == match.extending_char
+        );
 }
 
-// EncodeDictBase
+// EncodeDict
 // =============================================================================
 //
 // Base class for all dictionaries specialized for **encoding**. Derived class
-// should also inherit from `DictBase`.
+// should also inherit from `Dict`.
 //
 // The dictionary behaves like a growing automaton. It exposes a method named
 // `try_char()` which emits codeword number whenever the maximum match is found.
-class EncodeDictBase {
+class EncodeDict {
 public:
+    // TODO doc
+    EncodeDict (Buffer const& input);
+
     // Advances the internal state of the automaton, trying to match the
     // currently matched codeword extended by another letter, i.e., `a`.
     //
@@ -144,25 +130,45 @@ public:
     // the limit has been reached the codewords should receive the consecutive
     // integers as indices, starting from 1. Codeword number 0 is the special
     // _empty codeword_.
-    virtual Match try_char (char a) = 0;
+    // TODO
+    virtual Match try_char () = 0;
 
     // This methods acts as if `try_char()` was called with a special character
-    // that hasn't and won't occur in the processed text. This is to allow
-    // putting an unique character indicating _end of input_.
-    //
-    // **Warning:** If the `extending_char` field of the resulting `Match` is
-    // the imaginary unique character, it is obviously impossible to express it
-    // in terms of the `char` datatype. The caller must rely on the context
-    // of computation to determina if it's safe to use that value.
-    //
-    // __I was considering setting the type of the argument to `try_char()` to
-    // `int` which would allow passing the artificial character and
-    // `fail_char()` woudln't be needed. But this would introduce some
-    // additional branching in `try_char()`, which could affect performance as
-    // that method is called very often. If someone feels like implementing and
-    // testing that approach, he or she is very welcome to do so.__
+    // that hasn't and won't occur in the processed text. This allows simulting // an unique character indicating _end of input_, but more importantly,
+    // allows different behaviour depending on encoding method.
     virtual Match fail_char () = 0;
+
+    // TODO doc
+    void put_back (int char_cnt);
+
+    bool eob () const;
+
+protected:
+    // TODO doc
+    char get_char ();
+
+private:
+    // TODO doc
+    BufferCharReader m_reader;
 };
+
+inline EncodeDict::EncodeDict (Buffer const& input) :
+    m_reader(input)
+{
+    /* Do nothing. */
+}
+
+inline void EncodeDict::put_back (int char_cnt) {
+    m_reader.put_back(char_cnt);
+}
+
+inline bool EncodeDict::eob () const {
+    return m_reader.eob();
+}
+
+inline char EncodeDict::get_char () {
+    return m_reader.get();
+}
 
 // Codeword
 // =============================================================================
@@ -192,12 +198,12 @@ inline bool Codeword::operator == (Codeword const& cw) const {
     return begin == cw.begin && length == cw.length;
 }
 
-// DecodeDictBase
+// DecodeDict
 // =============================================================================
 //
 // Base class for all dictionaries specialized for **decoding**. Derived class
-// should also inherit from `DictBase`.
-class DecodeDictBase {
+// should also inherit from `Dict`.
+class DecodeDict {
     // Adds new codeword to the dictionary. The new codeword starts at `begin`
     // and is a one-letter extension of the existing codeword `i`. Unless the
     // limit has been reached the codewords should receive the consecutive
@@ -205,7 +211,18 @@ class DecodeDictBase {
     virtual void add_extension (int i, int begin) = 0;
 
     // Returns the `i`th codeword.
-    virtual Codeword const& codeword (int i) const = 0;
+    virtual Codeword codeword (int i) const = 0;
 };
 
-#endif // DICT_BASE_H
+// DictPair
+// =============================================================================
+//
+// TODO
+template <typename ED, typename DD>
+class DictPair {
+public:
+    typedef ED EncodeDict;
+    typedef DD DecodeDict;
+};
+
+#endif // DICT_H

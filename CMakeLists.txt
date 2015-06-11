@@ -6,8 +6,8 @@ project(LZCompression)
 
 set(LZC_HEADERS
   src/buffer.h
-  src/dict_base.h
-  src/lz_base.h
+  src/dict.h
+  src/lz.h
   src/lz78.h
   src/lzw.h
   src/prefix.h
@@ -31,12 +31,12 @@ set(LZC_TEST_HEADERS
 
 set(LZC_TEST_SOURCES
   test/buffer.cpp
-  test/encode_dict_node.cpp
   test/encoding_decoding.cpp
   test/lz78.cpp
   test/lzw.cpp
   test/main.cpp
   test/smru_dict.cpp
+  test/word_tree_node.cpp
 )
 
 add_executable(lzc_test ${LZC_TEST_HEADERS} ${LZC_TEST_SOURCES})

@@ -5,10 +5,10 @@
 #include <list>
 #include <vector>
 
-#include "dict_base.h"
+#include "dict.h"
 #include "word_tree_node.h"
 
-// SmruDictBase
+// SmruDict
 // =============================================================================
 //
 // Base class for the SMRU encode and decode dictionaries for use during LZ78/
@@ -26,15 +26,13 @@
 // Such approach enables us to store the codewords in a trie, which grants
 // efficient storage, match lookup and the overall linear time of the LZ
 // encoding.
-class SmruDictBase : public DictBase {
+class SmruDict : public Dict {
 public:
     // Creates a dictionary with given limit. The limits is the upper bound for
     // both, the number of codewords and the length of a single codeword.
-    explicit SmruDictBase (int limit);
+    explicit SmruDict (int limit, bool single_char_codewords);
 
-    // Implements `DictBase::make_permanent(int)`.
-    virtual void make_permanent (int i);
-
+protected:
     // This method handles the situation when the longest matching codeword is
     // found. It takes the number `i` of the longest matching codeword. Then it
     // moves `i` and all of it's prefixes to the back of the discard queue and
@@ -49,7 +47,8 @@ public:
     int match (int i);
 
 private:
-    // The discard queue. The elements are ordered with respect to time of use, // the least recently used codewords being in the front.
+    // The discard queue. The elements are ordered with respect to time of use,
+    // the least recently used codewords being in the front.
     std::list<int> m_queue;
 
     // The indices of codeword parents.
@@ -57,22 +56,25 @@ private:
 
     // The positions of codewords within the discard queue.
     std::vector<std::list<int>::iterator> m_queue_positions;
+    
+    // The number of codewords stored in the dictionary.
+    int m_size;
 };
 
 // SmruEncodeDict
 // =============================================================================
 //
 // The SMRU dictionary specialized for **encoding**.
-class SmruEncodeDict : public SmruDictBase, public EncodeDictBase {
+class SmruEncodeDict : public SmruDict, public EncodeDict {
 public:
     // Constructs a dictionary with given limit.
-    SmruEncodeDict (int limit);
+    SmruEncodeDict (Buffer const& input, int limit, bool single_char_codewords);
 
-    // Implements `EncodeDictBase::try_char(char)`. If the resulting new
-    // codeword would exceed the maximal length, it is rejected.
-    virtual Match try_char (char a);
+    // Implements `EncodeDict::try_char(char)`. If the resulting new codeword
+    // would exceed the maximal length, it is rejected.
+    virtual Match try_char ();
 
-    // Implements `EncodeDictBase::fail_char(char)`.
+    // Implements `EncodeDict::fail_char()`.
     virtual Match fail_char ();
 
 private:
@@ -94,17 +96,17 @@ private:
 // =============================================================================
 //
 // The SMRU dictionary specialized for **decoding**.
-class SmruDecodeDict : public SmruDictBase, public DecodeDictBase {
+class SmruDecodeDict : public SmruDict, public DecodeDict {
 public:
     // Constructs a new dictionary with given limit.
-    SmruDecodeDict (int limit);
+    SmruDecodeDict (int limit, bool single_char_codewords);
 
-    // Implements `DecodeDictBase::add_extension(int, int)`. If the resulting
+    // Implements `DecodeDict::add_extension(int, int)`. If the resulting
     // codeword would exceed the maximal length, it is silently ignored.
     virtual void add_extension (int i, int begin);
 
-    // Implements `DecodeDictBase::codeword(int)`.
-    virtual Codeword const& codeword (int i) const;
+    // Implements `DecodeDict::codeword(int)`.
+    virtual Codeword codeword (int i) const;
 
 private:
     std::vector<Codeword> m_codewords;
@@ -118,16 +120,10 @@ inline void SmruDecodeDict::add_extension (int i, int begin) {
         m_codewords[j] = Codeword(begin, m_codewords[i].length + 1);
 }
 
-inline Codeword const& SmruDecodeDict::codeword (int i) const {
+inline Codeword SmruDecodeDict::codeword (int i) const {
     return m_codewords[i];
 }
 
-// SmruDict
-// =============================================================================
-class SmruDict {
-public:
-    typedef SmruEncodeDict EncodeDict;
-    typedef SmruDecodeDict DecodeDict;
-};
+typedef DictPair<SmruEncodeDict, SmruDecodeDict> SmruDictPair;
 
 #endif // SMRU_DICT_H

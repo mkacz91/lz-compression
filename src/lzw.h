@@ -3,63 +3,56 @@
 
 #include "prefix.h"
 
-#include "lz_base.h"
+#include "lz.h"
 
 // Lzw
 // =============================================================================
 //
 // TODO: documentation
 template <typename Dict>
-class Lzw : public LzBase {
+class Lzw : public Lz {
 public:
     // Constructs an LZW encoder/decoder with given dictionary limit. The
     // actual limit of the dictionary used is expanded by `CHAR_CNT` as this
     // particular method adds all single-letter codewords to the dictionary.
     Lzw (int dictionary_limit);
 
-    // Implements `LzBase::encode(Buffer const&) const`.
+    // Implements `Lz::encode(Buffer const&) const`.
     virtual Buffer encode(Buffer const& input) const;
 
-    // Implements `LzBase::decode(Buffer const&) const`.
+    // Implements `Lz::decode(Buffer const&) const`.
     virtual Buffer decode(Buffer const& output) const;
 };
 
 template <typename Dict>
 Lzw<Dict>::Lzw (int dictionary_limit) :
-    LzBase(dictionary_limit + CHAR_CNT)
+    Lz(dictionary_limit + CHAR_CNT)
 {
     /* Do nothing */
 }
 
 template <typename Dict>
 Buffer Lzw<Dict>::encode (Buffer const& input) const {
-    typename Dict::EncodeDict dict(m_dictionary_limit);
+    // In this method, a dictionary preoccupied with single letter codewords is
+    // used.
+    typename Dict::EncodeDict dict(input, m_dictionary_limit, true);
     Buffer output;
-    BufferCharReader reader(input);
     BufferBitWriter writer(output);
-
-    // Stimulate creation of all possible single-letter codewords and mark them
-    // as permanent.
-    for (int a = 0; a < CHAR_CNT; ++a) {
-        dict.try_char(a);
-        // The new codeword has number `a + 1`.
-        dict.make_permanent(a + 1);
-    }
 
     // Number of positions ahead of the encoded part.
     int ahead = 0;
     // The outer loop iterates only at the end of the processed input and is
     // due to the presence of artificial terminating character.
-    while (!reader.eob()) {
-        while (!reader.eob()) {
-            char a = reader.get();
+    while (!dict.eob()) {
+        while (!dict.eob()) {
+            Match match = dict.try_char();
             ++ahead;
-            Match match = dict.try_char(a);
             if (match.is_maximal()) {
                 // Only the matching codeword number is written.
                 writer.put(match.codeword_no, m_codeword_no_length);
-                // We put back all chars up to the first unmatched one inclusive.
-                reader.put_back(ahead - match.length);
+                // We put back all chars up to the first unmatched one
+                // inclusive.
+                dict.put_back(ahead - match.length);
                 ahead = 0;
             }
         }
@@ -67,12 +60,12 @@ Buffer Lzw<Dict>::encode (Buffer const& input) const {
             // We reached the end of input but still have some partially matched
             // prefix. Behave as if a special terminating char was present.
             Match match = dict.fail_char();
+            ++ahead;
             writer.put(match.codeword_no, m_codeword_no_length);
-            if (match.length != ahead) {
+            if (match.length != ahead - 1) {
                 // The match terminates before the end of input. We have to
-                // prepare for another round. It's `+ 1` cause ahead` wasn't
-                // incremented on `fail_char()`.
-                reader.put_back(ahead - match.length + 1);
+                // prepare for another round.
+                dict.put_back(ahead - match.length);
                 ahead = 0;
             }
         }
@@ -83,17 +76,12 @@ Buffer Lzw<Dict>::encode (Buffer const& input) const {
 
 template <typename Dict>
 Buffer Lzw<Dict>::decode (Buffer const& output) const {
-    typename Dict::DecodeDict dict(m_dictionary_limit);
+    // In this method, a dictionary preoccupied with single letter codewords is
+    // used.
+    typename Dict::DecodeDict dict(m_dictionary_limit, true);
     Buffer input;
     BufferCharWriter writer(input);
     BufferBitReader reader(output);
-
-    // Stimulate creation of all possible single-letter codewords and mark them
-    // as permanent.
-    for (int a = 0; a < CHAR_CNT; ++a) {
-        dict.add_extension(0, -1);  // The `begin` field is irrelevant.
-        dict.make_permanent(a + 1); // The new codeword has number `a + 1`.
-    }
 
     // Starting position of the part not decoded yet.
     int pos = 0;
@@ -106,7 +94,8 @@ Buffer Lzw<Dict>::decode (Buffer const& output) const {
             // decoded text, but its number determines the letter instead.
             writer.put(i - 1);
         } else {
-            // This is an ordinary codeword. The first character of `cw` is the // last character of the codeword created during the preceding
+            // This is an ordinary codeword. The first character of `cw` is the
+            // last character of the codeword created during the preceding
             // iteration, and it wasn't known at that time. We have to
             // explicitly handle that character because in case those two
             // codewords are in fact the same, we might end up copying
