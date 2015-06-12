@@ -6,7 +6,7 @@ TEST (SmruDictTest, Encoding) {
     Buffer input;
     BufferCharWriter writer(input);
     writer.put("aabcacabcabcabcdabcda");
-    SmruEncodeDict d(input, 3, false);
+    Smru::EncodeDict d(input, 3, false);
 
     ASSERT_EQ(Match(0, 0, 'a'), d.try_char()); // a
     // a|
@@ -82,7 +82,7 @@ TEST (SmruDictTest, EncodingWithSingleCharCodewords) {
     Buffer input;
     BufferCharWriter writer(input);
     writer.put("ababccadaabc");
-    SmruEncodeDict d(input, 256 + 3, true);
+    Smru::EncodeDict d(input, 256 + 3, true);
 
     ASSERT_FALSE(d.try_char().is_maximal());              // a
     // a
@@ -123,7 +123,7 @@ TEST (SmruDictTest, EncodingWithSingleCharCodewords) {
 }
 
 TEST (SmruDictTest, Decoding) {
-    SmruDecodeDict d(3, false);
+    Smru::DecodeDict d(3, false);
 
     d.add_extension(0, 1); // 1: 1
     d.add_extension(0, 2); // 1: 1, 2: 2
@@ -157,7 +157,7 @@ TEST (SmruDictTest, Decoding) {
 }
 
 TEST (SmruDictTest, DecodingWithSingleCharCodewords) {
-    SmruDecodeDict d(CHAR_CNT + 3, true);
+    Smru::DecodeDict d(CHAR_CNT + 3, true);
 
     d.add_extension(int('a') + 1, 1); // 1: 1
     d.add_extension(int('b') + 1, 2); // 1: 1, 2: 2

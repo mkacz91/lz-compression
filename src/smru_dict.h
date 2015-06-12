@@ -6,14 +6,15 @@
 #include <vector>
 
 #include "dict.h"
+#include "pool_dict.h"
 #include "word_tree_node.h"
 
-// SmruDict
+// SmruPool
 // =============================================================================
 //
-// Base class for the SMRU encode and decode dictionaries for use during LZ78/
-// LZW factorization. Abbreviation SMRU stands for _Stongly Most Recently Used_
-// and refers to the codeword discard strategy.
+// Codeword pool for the SMRU encode and decode dictionaries for use during
+// LZ78/ LZW factorization. Abbreviation SMRU stands for _Stongly Most Recently
+// Used_.
 //
 // A SMRU dictionary is a dictionary of limited size that maintains only
 // a specified number of the most recently used codewords. The word _strongly_
@@ -26,13 +27,14 @@
 // Such approach enables us to store the codewords in a trie, which grants
 // efficient storage, match lookup and the overall linear time of the LZ
 // encoding.
-class SmruDict : public Dict {
+class SmruPool : public CodewordPool {
 public:
-    // Creates a dictionary with given limit. The limits is the upper bound for
+    // Creates a pool with given limit. The limits is the upper bound for
     // both, the number of codewords and the length of a single codeword.
-    explicit SmruDict (int limit, bool single_char_codewords);
+    explicit SmruPool (int limit, bool single_char_codewords);
 
-protected:
+    // Implements `CodewordPool::match(int)`.
+    //
     // This method handles the situation when the longest matching codeword is
     // found. It takes the number `i` of the longest matching codeword. Then it
     // moves `i` and all of it's prefixes to the back of the discard queue and
@@ -65,7 +67,7 @@ private:
 // =============================================================================
 //
 // The SMRU dictionary specialized for **encoding**.
-class SmruEncodeDict : public SmruDict, public EncodeDict {
+class SmruEncodeDict : public PoolDict<SmruPool>, public EncodeDict {
 public:
     // Constructs a dictionary with given limit.
     SmruEncodeDict (Buffer const& input, int limit, bool single_char_codewords);
@@ -92,38 +94,9 @@ private:
     int m_match_length;
 };
 
-// SmruDecodeDict
-// =============================================================================
-//
-// The SMRU dictionary specialized for **decoding**.
-class SmruDecodeDict : public SmruDict, public DecodeDict {
-public:
-    // Constructs a new dictionary with given limit.
-    SmruDecodeDict (int limit, bool single_char_codewords);
-
-    // Implements `DecodeDict::add_extension(int, int)`. If the resulting
-    // codeword would exceed the maximal length, it is silently ignored.
-    virtual void add_extension (int i, int begin);
-
-    // Implements `DecodeDict::codeword(int)`.
-    virtual Codeword codeword (int i) const;
-
-private:
-    std::vector<Codeword> m_codewords;
+struct Smru {
+    typedef SmruEncodeDict EncodeDict;
+    typedef PoolDecodeDict<SmruPool> DecodeDict;
 };
-
-inline void SmruDecodeDict::add_extension (int i, int begin) {
-    assert(0 <= i && i < m_codewords.size());
-
-    int j = this->match(i);
-    if (j != 0)
-        m_codewords[j] = Codeword(begin, m_codewords[i].length + 1);
-}
-
-inline Codeword SmruDecodeDict::codeword (int i) const {
-    return m_codewords[i];
-}
-
-typedef DictPair<SmruEncodeDict, SmruDecodeDict> Smru;
 
 #endif // SMRU_DICT_H

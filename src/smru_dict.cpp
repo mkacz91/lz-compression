@@ -1,10 +1,10 @@
 #include "smru_dict.h"
 
-// SmruDict
+// SmruPool
 // =============================================================================
 
-SmruDict::SmruDict (int limit, bool single_char_codewords) :
-    Dict(limit, single_char_codewords),
+SmruPool::SmruPool (int limit, bool single_char_codewords) :
+    CodewordPool(limit, single_char_codewords),
     m_size(0)
 {
     assert(limit > 0);
@@ -16,7 +16,7 @@ SmruDict::SmruDict (int limit, bool single_char_codewords) :
     m_parents.push_back(0);
     // Root is not subject to queueing.
     m_queue_positions.push_back(m_queue.end());
-    
+
     if (single_char_codewords) {
         m_parents.resize(CHAR_CNT + 1, 0);
         // Note that single char words are also not subject to queueing.
@@ -25,7 +25,7 @@ SmruDict::SmruDict (int limit, bool single_char_codewords) :
     }
 }
 
-int SmruDict::match (int i) {
+int SmruPool::match (int i) {
     assert(0 <= i && i <= m_size);
 
     // If a codeword is used, its prefixes are considered used more recently.
@@ -37,7 +37,7 @@ int SmruDict::match (int i) {
     }
 
     int j;
-    if (m_size < m_limit) {
+    if (m_size < limit()) {
         // We can use a fresh codeword.
         j = ++m_size;
         m_queue.push_front(j);
@@ -74,7 +74,7 @@ SmruEncodeDict::SmruEncodeDict(
     int limit,
     bool single_char_codewords
 ) :
-    SmruDict(limit, single_char_codewords),
+    PoolDict<SmruPool>(limit, single_char_codewords),
     EncodeDict(input)
 {
     // Initialize node pool. First element is always the root.
@@ -88,7 +88,7 @@ SmruEncodeDict::SmruEncodeDict(
         for (int a = 0; a < CHAR_CNT; ++a)
             m_nodes.front().link_child(a, &m_nodes[a + 1]);
     }
-    
+
     // Search starts at root.
     m_node = &m_nodes.front();
     m_match_length = 0;
@@ -123,17 +123,4 @@ Match SmruEncodeDict::fail_char () {
     // New search starts at root.
     m_node = &m_nodes.front();
     return Match(i, m_match_length, '\0'); // The extending char is irrelevant.
-}
-
-// SmruDecodeDict
-// =============================================================================
-
-SmruDecodeDict::SmruDecodeDict (int limit, bool single_char_codewords) :
-    SmruDict(limit, single_char_codewords),
-    m_codewords(limit + 1, Codeword(0, 0))
-{
-    if (single_char_codewords) {
-        for (int a = 0; a < CHAR_CNT; ++a)
-            m_codewords[a + 1].length = 1;
-    }
 }

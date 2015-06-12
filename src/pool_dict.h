@@ -204,6 +204,7 @@ inline CodewordPool::CodewordPool (int limit, bool single_char_codewords) :
     m_limit(limit)
 {
     assert(limit > 0);
+    assert(!single_char_codewords || limit > CHAR_CNT);
     // Argument `single_char_codewords` is here only to bting to mind that
     // such functionality has to be taken into account.
     UNUSED(single_char_codewords);
@@ -212,15 +213,5 @@ inline CodewordPool::CodewordPool (int limit, bool single_char_codewords) :
 inline int CodewordPool::limit () const {
     return m_limit;
 }
-
-// PoolDictPair
-// =============================================================================
-
-template <typename Pool>
-class PoolDictPair {
-public:
-    typedef PoolEncodeDict<Pool> EncodeDict;
-    typedef PoolDecodeDict<Pool> DecodeDict;
-};
 
 #endif // POOL_DICT_H
