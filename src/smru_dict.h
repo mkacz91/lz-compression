@@ -56,7 +56,7 @@ private:
 
     // The positions of codewords within the discard queue.
     std::vector<std::list<int>::iterator> m_queue_positions;
-    
+
     // The number of codewords stored in the dictionary.
     int m_size;
 };
@@ -124,6 +124,6 @@ inline Codeword SmruDecodeDict::codeword (int i) const {
     return m_codewords[i];
 }
 
-typedef DictPair<SmruEncodeDict, SmruDecodeDict> SmruDictPair;
+typedef DictPair<SmruEncodeDict, SmruDecodeDict> Smru;
 
 #endif // SMRU_DICT_H

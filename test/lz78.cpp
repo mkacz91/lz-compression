@@ -5,7 +5,7 @@
 
 class SmruLz78Test : public testing::Test {
 protected:
-    Lz78<SmruDictPair> lz78;
+    Lz78<Smru> lz78;
     Buffer input;
     Buffer output;
 

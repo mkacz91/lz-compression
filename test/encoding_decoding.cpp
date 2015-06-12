@@ -3,6 +3,7 @@
 #include "../src/buffer.h"
 #include "../src/lz78.h"
 #include "../src/lzw.h"
+#include "../src/mra_dict.h"
 #include "../src/smru_dict.h"
 
 template <typename Lz>
@@ -48,8 +49,10 @@ void EncodeDecodeTest<Lz>::init_lorem_ipsum () {
 }
 
 typedef testing::Types<
-    Lz78<SmruDictPair>,
-    Lzw<SmruDictPair>
+    Lz78<Smru>,
+    Lzw<Smru>,
+    Lz78<Mra>,
+    Lzw<Mra>
 > algos;
 TYPED_TEST_CASE(EncodeDecodeTest, algos);
 

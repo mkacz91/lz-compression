@@ -32,7 +32,7 @@ PoolDictTree::~PoolDictTree () {
 void PoolDictTree::extend (int i, int begin, int j) {
     assert(0 <= i && i <  m_nodes.size());
     assert(0 <  j && j <= m_nodes.size());
-    
+
     Node* to_remove = nullptr;
     if (j == m_nodes.size()) {
         m_nodes.push_back(nullptr);
@@ -83,7 +83,7 @@ void PoolDictTree::extend (int i, int begin, int j) {
         lower->tag = Tag(true, j, begin, length);
         m_nodes[j] = lower;
     }
-    
+
     if (to_remove != nullptr)
         remove(to_remove);
 }
@@ -142,15 +142,4 @@ inline BufferCharSlice PoolDictTree::slice (int begin, int length) const {
     return begin < 0
         ? BufferCharSlice(m_alphabet, -begin, length)
         : BufferCharSlice(m_input, begin, length);
-}
-
-// PoolDictTree::Edge
-// =============================================================================
-
-inline
-PoolDictTree::Edge::Edge (Node const* dst, BufferCharSlice const& slice) :
-    dst(dst),
-    m_slice(slice)
-{
-    assert(dst != nullptr);
 }

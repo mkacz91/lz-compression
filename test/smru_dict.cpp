@@ -123,7 +123,6 @@ TEST (SmruDictTest, EncodingWithSingleCharCodewords) {
 }
 
 TEST (SmruDictTest, Decoding) {
-    // TODO true
     SmruDecodeDict d(3, false);
 
     d.add_extension(0, 1); // 1: 1

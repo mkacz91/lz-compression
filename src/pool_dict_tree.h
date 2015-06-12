@@ -124,6 +124,14 @@ operator == (PoolDictTree::Tag const& tag1, PoolDictTree::Tag const& tag2) {
 // PoolDictTree::Edge
 // =============================================================================
 
+inline
+PoolDictTree::Edge::Edge (Node const* dst, BufferCharSlice const& slice) :
+    dst(dst),
+    m_slice(slice)
+{
+    assert(dst != nullptr);
+}
+
 inline int PoolDictTree::Edge::length () const {
     return m_slice.length();
 }

@@ -5,7 +5,7 @@
 
 class SmruLzwTest : public testing::Test {
 protected:
-    Lzw<SmruDictPair> lzw;
+    Lzw<Smru> lzw;
     Buffer input;
     Buffer output;
 

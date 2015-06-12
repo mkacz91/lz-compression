@@ -6,7 +6,7 @@ TEST (MraDictTest, Encoding) {
     Buffer input;
     BufferCharWriter writer(input);
     writer.put("aabccdacdacabd");
-    MraDictPair::EncodeDict d(input, 3, false);
+    Mra::EncodeDict d(input, 3, false);
 
     ASSERT_EQ(Match(0, 0, 'a'), d.try_char()); // a
     // a|
@@ -62,4 +62,24 @@ TEST (MraDictTest, Encoding) {
     ASSERT_EQ(Match(0, 0, 'd'), d.try_char()); // d
     // *|* *|*|* *|*|* * *|c|a b|d
     //                     1  2  3
+}
+
+TEST (MraDictTest, Decoding) {
+    Mra::DecodeDict d(3, false);
+
+    d.add_extension(0, 1); // 0->1
+    d.add_extension(0, 2); // 0->1, 0->2
+    d.add_extension(1, 3); // 0->1, 0->2, 1->3
+
+    ASSERT_EQ(Codeword(0, 0), d.codeword(0));
+    ASSERT_EQ(Codeword(1, 1), d.codeword(1));
+    ASSERT_EQ(Codeword(2, 1), d.codeword(2));
+    ASSERT_EQ(Codeword(3, 2), d.codeword(3));
+
+    d.add_extension(2, 4); // 2->4, 0->2, 1->3
+
+    ASSERT_EQ(Codeword(0, 0), d.codeword(0));
+    ASSERT_EQ(Codeword(4, 2), d.codeword(1));
+    ASSERT_EQ(Codeword(2, 1), d.codeword(2));
+    ASSERT_EQ(Codeword(3, 2), d.codeword(3));
 }
