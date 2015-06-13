@@ -54,10 +54,10 @@ Buffer Lz78<DictPair>::encode (Buffer const& input) const {
         if (ahead != 0) {
             // We reached the end of input but still have some partially matched
             // prefix. Behave as if a special terminating char was present.
+            // Notice that `ahead` is not incremented.
             Match match = dict.fail_char();
-            ++ahead;
             writer.put(match.codeword_no, m_codeword_no_length);
-            if (match.length != ahead - 1) {
+            if (match.length != ahead) {
                 // The match terminates before the end of input, i.e.,
                 // `match.extending_char` is some valid char. We write it and
                 // prepare for another round.

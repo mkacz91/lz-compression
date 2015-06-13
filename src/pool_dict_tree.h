@@ -31,6 +31,10 @@ public:
     class Edge {
     public:
         Node const* dst;
+        
+        Edge ();
+        
+        Edge (Node const* dst, BufferCharSlice const& slice);
 
         int length () const;
 
@@ -38,8 +42,6 @@ public:
 
     private:
         BufferCharSlice m_slice;
-
-        Edge (Node const* dst, BufferCharSlice const& slice);
 
         friend class PoolDictTree;
         friend bool operator == (Edge const& e1, Edge const& e2);
@@ -71,7 +73,7 @@ public:
     Edge edge (Node const* node, char a) const;
 
     // TODO doc
-    Edge edge_to_root () const;
+    Node const* root () const;
 
 private:
 
@@ -95,8 +97,8 @@ private:
     BufferCharSlice slice (int begin, int length) const;
 };
 
-inline PoolDictTree::Edge PoolDictTree::edge_to_root () const {
-    return Edge(m_root, BufferCharSlice());
+inline PoolDictTree::Node const* PoolDictTree::root () const {
+    return m_root;
 }
 
 // PoolDictBase::Tag
@@ -123,6 +125,12 @@ operator == (PoolDictTree::Tag const& tag1, PoolDictTree::Tag const& tag2) {
 
 // PoolDictTree::Edge
 // =============================================================================
+
+inline PoolDictTree::Edge::Edge () :
+    dst(nullptr)
+{
+    /* Do nothing. */
+}
 
 inline
 PoolDictTree::Edge::Edge (Node const* dst, BufferCharSlice const& slice) :

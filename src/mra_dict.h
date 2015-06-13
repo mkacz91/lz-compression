@@ -38,6 +38,9 @@ inline int MraPool::match (int i) {
     }
 }
 
-typedef PoolDictPair<MraPool> Mra;
+struct Mra {
+    typedef PoolEncodeDict<MraPool> EncodeDict;
+    typedef PoolDecodeDict<MraPool> DecodeDict;
+};
 
 #endif // MRA_DICT_H

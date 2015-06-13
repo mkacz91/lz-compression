@@ -95,7 +95,7 @@ PoolDictTree::Edge PoolDictTree::edge (Node const* node, char a) const {
 
     Node* child = const_cast<Node*>(node)->child(a);
     if (child == nullptr) {
-        return edge_to_root();
+        return Edge();
     } else {
         int begin = child->tag.begin + node->tag.length;
         int length = child->tag.length - node->tag.length;

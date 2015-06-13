@@ -6,15 +6,6 @@ typedef PoolDictTree::Node Node;
 typedef PoolDictTree::Tag Tag;
 typedef PoolDictTree::Edge Edge;
 
-TEST (PoolDictTreeTest, EdgeToRoot) {
-    Buffer input;
-    PoolDictTree t(input);
-    Edge edge = t.edge_to_root();
-    EXPECT_EQ(0, edge.length());
-    EXPECT_NE(nullptr, edge.dst);
-    EXPECT_TRUE(edge.dst->is_root());
-}
-
 TEST (PoolDictTreeTest, Extending) {
     Buffer input;
     BufferCharWriter writer(input);
@@ -23,7 +14,7 @@ TEST (PoolDictTreeTest, Extending) {
     //          0  3    8
 
     PoolDictTree t(input);
-    Node const* root = t.edge_to_root().dst;
+    Node const* root = t.root();
     ASSERT_TRUE(root->is_leaf());
     ASSERT_EQ(Tag(true, 0, 0, 0), root->tag);
 

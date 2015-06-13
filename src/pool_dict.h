@@ -59,10 +59,15 @@ private:
     typedef PoolDictTree::Edge Edge;
 
     PoolDictTree m_tree;
+    Node const* m_node;
     Edge m_edge;
     Match m_match;
     int m_match_begin;
     int m_edge_pos;
+    
+    void try_extend ();
+    
+    void reset_search ();
 };
 
 template <typename Pool>
@@ -73,9 +78,7 @@ PoolEncodeDict<Pool>::PoolEncodeDict (
 ) :
     PoolDict<Pool>(limit, single_char_codewords),
     EncodeDict(input),
-    m_tree(input),
-    m_edge(m_tree.edge_to_root()),
-    m_edge_pos(0)
+    m_tree(input)
 {
     if (single_char_codewords) {
         // Class `PoolDictTree` behaves as if the attached input were prepended
@@ -83,6 +86,7 @@ PoolEncodeDict<Pool>::PoolEncodeDict (
         for (int a = 0; a < CHAR_CNT; ++a)
             m_tree.extend(0, -a - 1, a + 1);
     }
+    reset_search();
 }
 
 template <typename Pool>
@@ -90,55 +94,58 @@ Match PoolEncodeDict<Pool>::try_char () {
     char a = this->get_char();
     bool matches = false;
     if (m_edge_pos == 0) {
-        // No intermediate match is in progress. A full match or a failure was
-        // found in the preceding call to `try_char()`. We have to choose a new
-        // branch to go to.
-        Node const* node = m_edge.dst;
-        // If our starting point is root, we have to initiate new match
-        if (node->is_root()) {
-            m_match.codeword_no = 0;
-            m_match.length = 0;
+        // We are right at an explicit node and have to choose branch.
+        m_edge = m_tree.edge(m_node, a);
+        matches = (m_edge.dst != nullptr);
+        if (m_node->tag.active)
+            m_match = Match(m_node->tag.codeword_no, m_node->tag.length, a);
+        if (m_node->is_root())
             m_match_begin = this->pos();
-        }
-        m_edge = m_tree.edge(node, a);
-        matches = !m_edge.dst->is_root();
-        // If this is not just a bifurcation, we just got the missing char for
-        // our match.
-        if (m_edge.dst->tag.active)
-            m_match.extending_char = a;
     } else {
         matches = (m_edge[m_edge_pos] == a);
     }
 
     if (matches) {
-        ++m_edge_pos;
-        if (m_edge_pos == m_edge.length()) {
-            // Start another branch in the next call to `try_char()`.
+        if (++m_edge_pos == m_edge.length()) {
             m_edge_pos = 0;
-            // This may also be a full codeword match.
-            if (m_edge.dst->tag.active) {
-                m_match.codeword_no = m_edge.dst->tag.codeword_no;
-                m_match.length += m_edge.length();
-            }
+            m_node = m_edge.dst;
         }
         return Match();
     } else {
-        int new_codeword_no = this->match(m_match.codeword_no);
-        if (new_codeword_no != 0)
-            m_tree.extend(m_match.codeword_no, m_match_begin, new_codeword_no);
-        // Start from root in the next call to `try_char()`.
-        m_edge_pos = 0;
-        m_edge = m_tree.edge_to_root();
+        try_extend();
+        reset_search();
         return m_match;
     }
 }
 
 template <typename Pool>
 Match PoolEncodeDict<Pool>::fail_char () {
-    int new_codeword_no = this->match(m_match.codeword_no);
-    if (m_edge_pos != 0 && new_codeword_no != 0)
-        m_tree.extend(m_match.codeword_no, m_match_begin, new_codeword_no);
+    // Who would _ever_ want to do this?
+    assert(!m_node->is_root() || m_edge_pos != 0);
+    
+    if (m_edge_pos == 0 && m_node->tag.active)
+        m_match = Match(m_node->tag.codeword_no, m_node->tag.length, '\0');
+    else if (m_edge_pos != 0 || !m_edge.dst->tag.active) {
+        // This check prevents us from extending the codewords beyound the end
+        // of text
+        try_extend();
+    }
+    reset_search();
     return m_match;
+}
+
+template <typename Pool>
+inline void PoolEncodeDict<Pool>::try_extend () {
+    int i = m_match.codeword_no;
+    int j = this->match(i);
+    if (j != 0)
+        m_tree.extend(i, m_match_begin, j);
+}
+
+template <typename Pool>
+inline void PoolEncodeDict<Pool>::reset_search () {
+    m_node = m_tree.root();
+    m_edge_pos = 0;
 }
 
 // PoolDecodeDict
