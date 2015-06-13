@@ -31,7 +31,7 @@ class SmruPool : public CodewordPool {
 public:
     // Creates a pool with given limit. The limits is the upper bound for
     // both, the number of codewords and the length of a single codeword.
-    explicit SmruPool (int limit, bool single_char_codewords);
+    SmruPool (int limit, bool single_char_codewords);
 
     // Implements `CodewordPool::match(int)`.
     //
@@ -94,8 +94,16 @@ private:
     int m_match_length;
 };
 
+// Smru
+// =============================================================================
+
 struct Smru {
     typedef SmruEncodeDict EncodeDict;
+    typedef PoolDecodeDict<SmruPool> DecodeDict;
+};
+
+struct Smru2 {
+    typedef PoolEncodeDict<SmruPool> EncodeDict;
     typedef PoolDecodeDict<SmruPool> DecodeDict;
 };
 

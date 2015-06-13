@@ -15,12 +15,14 @@ set(LZC_HEADERS
   src/pool_dict.h
   src/prefix.h
   src/smru_dict.h
+  src/wmru_dict.h
 )
 
 set(LZC_SOURCES
   src/buffer.cpp
   src/pool_dict_tree.cpp
   src/smru_dict.cpp
+  src/wmru_dict.cpp
 )
 
 add_library(lzc ${LZC_HEADERS} ${LZC_SOURCES})

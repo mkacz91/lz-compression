@@ -5,6 +5,7 @@
 #include "../src/lzw.h"
 #include "../src/mra_dict.h"
 #include "../src/smru_dict.h"
+#include "../src/wmru_dict.h"
 
 template <typename Lz>
 class EncodeDecodeTest : public testing::Test {
@@ -52,7 +53,11 @@ typedef testing::Types<
     Lz78<Smru>,
     Lzw<Smru>,
     Lz78<Mra>,
-    Lzw<Mra>
+    Lzw<Mra>,
+    Lz78<Wmru>,
+    Lzw<Wmru>,
+    Lz78<Smru2>,
+    Lzw<Smru2>
 > algos;
 TYPED_TEST_CASE(EncodeDecodeTest, algos);
 

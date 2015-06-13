@@ -7,9 +7,6 @@ SmruPool::SmruPool (int limit, bool single_char_codewords) :
     CodewordPool(limit, single_char_codewords),
     m_size(0)
 {
-    assert(limit > 0);
-    assert(!single_char_codewords || limit >= CHAR_CNT);
-
     // The 0 index is reserved for the empty codeword.
     m_parents.reserve(limit + 1);
     m_queue_positions.reserve(limit + 1);
