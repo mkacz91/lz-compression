@@ -1,5 +1,8 @@
 #include "buffer.h"
 
+// Buffer
+// =============================================================================
+
 Buffer::Buffer () :
     m_data(new word[1]),
     m_capacity(1),
@@ -63,6 +66,9 @@ std::ostream& operator << (std::ostream& ostr, Buffer const& buffer) {
     return ostr;
 }
 
+// BufferBitReader
+// =============================================================================
+
 BufferBitReader::BufferBitReader(Buffer const& buffer) :
     m_data(buffer.m_data),
     m_left(buffer.m_size),
@@ -88,6 +94,9 @@ word BufferBitReader::get (int bit_cnt) {
     return result & ~lshift(ONES_MASK, bit_cnt);
 }
 
+// BufferBitWriter
+// =============================================================================
+
 BufferBitWriter::BufferBitWriter(Buffer& buffer) :
     m_buffer(buffer),
     m_pos(buffer.m_size / WORD_LENGTH),
@@ -111,13 +120,19 @@ void BufferBitWriter::put (word data, int bit_cnt) {
     m_buffer.m_size += bit_cnt;
 }
 
+// BufferCharReader
+// =============================================================================
+
 BufferCharReader::BufferCharReader (Buffer const& buffer) :
     m_data(reinterpret_cast<char const*>(buffer.m_data)),
-    m_char_cnt(buffer.m_size / CHAR_LENGTH),
+    m_char_cnt(ceil_div(buffer.m_size, CHAR_LENGTH)),
     m_pos(0)
 {
     /* Do nothing */
 }
+
+// BufferCharWriter
+// =============================================================================
 
 BufferCharWriter::BufferCharWriter (Buffer& buffer) :
     m_buffer(buffer),

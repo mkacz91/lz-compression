@@ -7,6 +7,7 @@ project(LZCompression)
 set(LZC_HEADERS
   src/buffer.h
   src/dict.h
+  src/huffman.h
   src/lz.h
   src/lz78.h
   src/lzw.h
@@ -20,6 +21,7 @@ set(LZC_HEADERS
 
 set(LZC_SOURCES
   src/buffer.cpp
+  src/huffman.cpp
   src/pool_dict_tree.cpp
   src/smru_dict.cpp
   src/wmru_dict.cpp
@@ -38,6 +40,7 @@ set(LZC_TEST_HEADERS
 set(LZC_TEST_SOURCES
   test/buffer.cpp
   test/encoding_decoding.cpp
+  test/huffman.cpp
   test/lz78.cpp
   test/lzw.cpp
   test/main.cpp

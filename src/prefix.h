@@ -16,6 +16,7 @@ using std::string;
 typedef uint32_t word;
 int const WORD_LENGTH = 32;
 int const CHAR_LENGTH = 8;
+int const INT_LENGTH = 32; // Well...
 word const NULL_WORD = 0;
 word const ONES_MASK = ~NULL_WORD;
 int const CHAR_CNT = 256;
@@ -63,6 +64,12 @@ inline int ceil_log2 (int n) {
         p *= 2;
     }
     return i;
+}
+
+template <typename T>
+inline T ceil_div (T a, T b) {
+    T c = a / b;
+    return a == c * b ? c : c + 1;
 }
 
 #endif // PREFIX_H
