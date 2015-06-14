@@ -19,7 +19,7 @@ public:
 private:
     class Node {
     public:
-        Node (char value, int weight);
+        Node (int value, int weight);
 
         Node (Node const* one_child, Node const* zero_child);
 
@@ -29,18 +29,22 @@ private:
 
         bool is_leaf () const;
 
-        char value () const;
+        int value () const;
 
         int weight () const;
+        
+        int size () const;
 
     private:
         Node const* m_one_child;
 
         Node const* m_zero_child;
 
-        char m_value;
+        int m_value;
 
         int m_weight;
+        
+        int m_size;
     };
 
     struct NodeCompare {

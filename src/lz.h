@@ -33,7 +33,7 @@ inline Lz::Lz (int dictionary_limit) :
     m_codeword_no_length(
         m_dictionary_limit > 0
             ? ceil_log2(m_dictionary_limit)
-            : WORD_LENGTH
+            : WORD_BITS
     )
 {
     /* Do nothing */

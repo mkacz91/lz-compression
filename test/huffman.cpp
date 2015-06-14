@@ -6,7 +6,6 @@ TEST (HuffmanTest, SingleChar) {
     Buffer input;
     BufferCharWriter writer(input);
     writer.put("x");
-    cout << input << endl;
     ASSERT_EQ(input, Huffman::decode(Huffman::encode(input)));
 }
 
@@ -31,6 +30,9 @@ TEST (HuffmanTest, LoremIpsum) {
 TEST (HuffmanTest, Uneven) {
     Buffer input;
     BufferBitWriter writer(input);
+    writer.put(0x12345678, 32);
+    writer.put(0x12345678, 32);
+    writer.put(0x12345678, 32);
     writer.put(0x12345678, 32);
     writer.put(0x0009ABCD, 20);
     ASSERT_EQ(input, Huffman::decode(Huffman::encode(input)));

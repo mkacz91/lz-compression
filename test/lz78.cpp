@@ -22,15 +22,15 @@ SmruLz78Test::SmruLz78Test () :
 
     BufferBitWriter owriter(output);
     owriter.put( 0 , codeword_no_length);
-    owriter.put('a', CHAR_LENGTH       ); // a|
+    owriter.put('a', CHAR_BITS       ); // a|
     owriter.put( 1 , codeword_no_length);
-    owriter.put('b', CHAR_LENGTH       ); // a|a b|
+    owriter.put('b', CHAR_BITS       ); // a|a b|
     owriter.put( 2 , codeword_no_length);
-    owriter.put('b', CHAR_LENGTH       ); // a|a b|a b b|
+    owriter.put('b', CHAR_BITS       ); // a|a b|a b b|
     owriter.put( 1 , codeword_no_length);
-    owriter.put('c', CHAR_LENGTH       ); // a|a b|* * *|a c|
+    owriter.put('c', CHAR_BITS       ); // a|a b|* * *|a c|
     owriter.put( 2 , codeword_no_length);
-    owriter.put('c', CHAR_LENGTH       ); // a|a b|* * *|* *|a b c|a
+    owriter.put('c', CHAR_BITS       ); // a|a b|* * *|* *|a b c|a
     owriter.put( 1 , codeword_no_length); // a|a b|* * *|* *|a b c|a
 }
 

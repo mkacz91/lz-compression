@@ -73,20 +73,20 @@ BufferBitReader::BufferBitReader(Buffer const& buffer) :
     m_data(buffer.m_data),
     m_left(buffer.m_size),
     m_pos(0),
-    m_offset(WORD_LENGTH)
+    m_offset(WORD_BITS)
 {
     /* Do nothing */
 }
 
 word BufferBitReader::get (int bit_cnt) {
     assert(bit_cnt >= 0);
-    assert(bit_cnt <= WORD_LENGTH);
+    assert(bit_cnt <= WORD_BITS);
     assert(bit_cnt <= m_left);
 
     m_offset -= bit_cnt;
     word result = rshift(m_data[m_pos], m_offset);
     if (m_offset <= 0) {
-        m_offset += WORD_LENGTH;
+        m_offset += WORD_BITS;
         ++m_pos;
         result |= rshift(m_data[m_pos], m_offset);
     }
@@ -99,21 +99,21 @@ word BufferBitReader::get (int bit_cnt) {
 
 BufferBitWriter::BufferBitWriter(Buffer& buffer) :
     m_buffer(buffer),
-    m_pos(buffer.m_size / WORD_LENGTH),
-    m_offset(WORD_LENGTH - buffer.m_size % WORD_LENGTH)
+    m_pos(buffer.m_size / WORD_BITS),
+    m_offset(WORD_BITS - buffer.m_size % WORD_BITS)
 {
     /* Do nothing */
 }
 
 void BufferBitWriter::put (word data, int bit_cnt) {
     assert(bit_cnt >= 0);
-    assert(bit_cnt <= WORD_LENGTH);
+    assert(bit_cnt <= WORD_BITS);
     assert((data & ~lshift(ONES_MASK, bit_cnt)) == data);
 
     m_offset -= bit_cnt;
     m_buffer.m_data[m_pos] |= lshift(data, m_offset);
     if (m_offset <= 0) {
-        m_offset += WORD_LENGTH;
+        m_offset += WORD_BITS;
         ++m_pos;
         m_buffer.push_back(lshift(data, m_offset));
     }
@@ -125,7 +125,7 @@ void BufferBitWriter::put (word data, int bit_cnt) {
 
 BufferCharReader::BufferCharReader (Buffer const& buffer) :
     m_data(reinterpret_cast<char const*>(buffer.m_data)),
-    m_char_cnt(ceil_div(buffer.m_size, CHAR_LENGTH)),
+    m_char_cnt(buffer.m_size / CHAR_BITS),
     m_pos(0)
 {
     /* Do nothing */
@@ -136,17 +136,17 @@ BufferCharReader::BufferCharReader (Buffer const& buffer) :
 
 BufferCharWriter::BufferCharWriter (Buffer& buffer) :
     m_buffer(buffer),
-    m_pos(buffer.m_size / CHAR_LENGTH)
+    m_pos(buffer.m_size / CHAR_BITS)
 {
     // Permit only properly aligned buffers.
-    assert(buffer.m_size % CHAR_LENGTH == 0);
+    assert(buffer.m_size % CHAR_BITS == 0);
 }
 
 void BufferCharWriter::put (char data) {
     reinterpret_cast<char*>(m_buffer.m_data)[m_pos] = data;
-    m_buffer.m_size += CHAR_LENGTH;
+    m_buffer.m_size += CHAR_BITS;
     ++m_pos;
-    if (m_buffer.m_open_word_cnt <= m_pos * CHAR_LENGTH / WORD_LENGTH)
+    if (m_buffer.m_open_word_cnt <= m_pos / WORD_CHARS)
         m_buffer.push_back(NULL_WORD);
 }
 
@@ -158,7 +158,7 @@ void BufferCharWriter::put (string const& data) {
 
 void BufferCharWriter::put (BufferCharSlice const& slice) {
     int new_pos = m_pos + slice.m_length;
-    int new_open_word_cnt = new_pos * CHAR_LENGTH / WORD_LENGTH + 1;
+    int new_open_word_cnt = new_pos / WORD_CHARS + 1;
     word* const old_data = m_buffer.adjust_capacity(new_open_word_cnt);
     if (m_buffer.m_open_word_cnt < new_open_word_cnt) {
         // If new words are opened. The last one would end up with undefined
@@ -174,6 +174,18 @@ void BufferCharWriter::put (BufferCharSlice const& slice) {
     // The deletion of `old_data` is delayed until now, because `slice` may
     // come from `m_buffer` itself.
     delete[] old_data;
-    m_buffer.m_size += slice.m_length * CHAR_LENGTH;
+    m_buffer.m_size += slice.m_length * CHAR_BITS;
     m_pos = new_pos;
+}
+
+void BufferCharWriter::put_last_word (word data, int bit_cnt) {
+    assert(m_pos % WORD_CHARS == 0);
+    assert(m_buffer.m_size % WORD_BITS == 0);
+    assert(0 <= bit_cnt && bit_cnt <= WORD_BITS);
+    m_buffer.m_data[m_buffer.m_open_word_cnt - 1] = data;
+    m_buffer.m_size += bit_cnt;
+    if (bit_cnt == WORD_BITS) {
+        ++m_buffer.m_open_word_cnt;
+        m_buffer.adjust_capacity(m_buffer.m_open_word_cnt);
+    }
 }

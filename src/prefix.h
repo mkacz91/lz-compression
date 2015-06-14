@@ -14,9 +14,10 @@ using std::string;
 #include <cstdint>
 // TODO: Investigate 32 vs 64 bit
 typedef uint32_t word;
-int const WORD_LENGTH = 32;
-int const CHAR_LENGTH = 8;
-int const INT_LENGTH = 32; // Well...
+int const WORD_BITS = 32;
+int const CHAR_BITS = 8;
+int const WORD_CHARS = WORD_BITS / CHAR_BITS;
+int const INT_BITS = 32; // Well...
 word const NULL_WORD = 0;
 word const ONES_MASK = ~NULL_WORD;
 int const CHAR_CNT = 256;
@@ -35,10 +36,10 @@ using std::make_pair;
 #define UNUSED(var) (void)(var)
 
 inline word lshift (word x, int n) {
-    if (n >= WORD_LENGTH)
+    if (n >= WORD_BITS)
         return NULL_WORD;
     if (n < 0) {
-        if (n <= -WORD_LENGTH)
+        if (n <= -WORD_BITS)
             return NULL_WORD;
         return x >> (-n);
     }
@@ -46,10 +47,10 @@ inline word lshift (word x, int n) {
 }
 
 inline word rshift (word x, int n) {
-    if (n >= WORD_LENGTH)
+    if (n >= WORD_BITS)
         return NULL_WORD;
     if (n < 0) {
-        if (n <= -WORD_LENGTH)
+        if (n <= -WORD_BITS)
             return NULL_WORD;
         return x << (-n);
     }

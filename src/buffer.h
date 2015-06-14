@@ -117,7 +117,7 @@ public:
     BufferBitWriter (Buffer& buffer);
 
     // Appends `bit_count` least significant bits of `data` to the buffer. The
-    // value `bit_count` may not exceed `WORD_LENGTH`.
+    // value `bit_count` may not exceed `WORD_BITS`.
     void put (word data, int bit_cnt);
 
 private:
@@ -158,6 +158,11 @@ public:
     // is read, the result is `-1`.
     int pos () const;
 
+    // If one is reading a buffer that is not created with `CharBufferWriter`,
+    // the last word doesn't make sense and has to be handled explicityly. This
+    // method returns that last word as a workaround.
+    word last_word () const;
+
 private:
     // The data array of the attached buffer.
     char const* m_data;
@@ -186,6 +191,10 @@ inline bool BufferCharReader::eob () const {
 
 inline int BufferCharReader::pos () const {
     return m_pos - 1;
+}
+
+inline word BufferCharReader::last_word () const {
+    return reinterpret_cast<word const*>(m_data)[m_char_cnt / WORD_CHARS];
 }
 
 // BufferCharSlice
@@ -245,8 +254,8 @@ inline BufferCharSlice::BufferCharSlice (
     m_begin(reinterpret_cast<char const*>(buffer.m_data) + begin),
     m_length(max(0, length))
 {
-    assert(begin < buffer.m_size / CHAR_LENGTH || m_length == 0);
-    assert(begin + m_length <= buffer.m_size / CHAR_LENGTH);
+    assert(begin < buffer.m_size / CHAR_BITS || m_length == 0);
+    assert(begin + m_length <= buffer.m_size / CHAR_BITS);
 }
 
 inline int BufferCharSlice::length () const {
@@ -297,6 +306,9 @@ public:
     // Appends a slice to the buffer. This operation is valid even if `slice`
     // comes from the same buffer it is being written to.
     void put (BufferCharSlice const& slice);
+
+    // TODO doc
+    void put_last_word (word data, int bit_cnt);
 
 private:
     // The attached buffer.

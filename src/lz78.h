@@ -46,7 +46,7 @@ Buffer Lz78<DictPair>::encode (Buffer const& input) const {
             ++ahead;
             if (match.is_maximal()) {
                 writer.put(match.codeword_no, m_codeword_no_length);
-                writer.put(match.extending_char, CHAR_LENGTH);
+                writer.put(match.extending_char, CHAR_BITS);
                 dict.put_back(ahead - match.length - 1);
                 ahead = 0;
             }
@@ -61,7 +61,7 @@ Buffer Lz78<DictPair>::encode (Buffer const& input) const {
                 // The match terminates before the end of input, i.e.,
                 // `match.extending_char` is some valid char. We write it and
                 // prepare for another round.
-                writer.put(match.extending_char, CHAR_LENGTH);
+                writer.put(match.extending_char, CHAR_BITS);
                 dict.put_back(ahead - match.length - 1);
                 ahead = 0;
             }
@@ -88,7 +88,7 @@ Buffer Lz78<DictPair>::decode (Buffer const& output) const {
         pos += cw.length;
         // If this was the last codeword, no extending character follows.
         if (!reader.eob()) {
-            writer.put(reader.get(CHAR_LENGTH));
+            writer.put(reader.get(CHAR_BITS));
             ++pos;
         }
     }
