@@ -20,6 +20,9 @@ public:
 
     // Implements `Lz::decode(Buffer const&) const`.
     virtual Buffer decode(Buffer const& output) const;
+
+    // Implements `Lz::codeword_bits () const`.
+    virtual int codeword_bits () const;
 };
 
 template <typename DictPair>
@@ -46,7 +49,7 @@ Buffer Lz78<DictPair>::encode (Buffer const& input) const {
             ++ahead;
             if (match.is_maximal()) {
                 writer.put(match.codeword_no, m_codeword_no_length);
-                writer.put(match.extending_char, CHAR_BITS);
+                writer.put((unsigned char)match.extending_char, CHAR_BITS);
                 dict.put_back(ahead - match.length - 1);
                 ahead = 0;
             }
@@ -94,6 +97,11 @@ Buffer Lz78<DictPair>::decode (Buffer const& output) const {
     }
 
     return input;
+}
+
+template <typename DictPair>
+inline int Lz78<DictPair>::codeword_bits () const {
+    return m_codeword_no_length + CHAR_BITS;
 }
 
 #endif // LZ78_H

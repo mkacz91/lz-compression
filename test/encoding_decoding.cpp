@@ -12,18 +12,22 @@ class EncodeDecodeTest : public testing::Test {
 protected:
     Buffer single_char;
     Buffer lorem_ipsum;
+    Buffer alphabet;
 
     EncodeDecodeTest ();
 
     void init_single_char ();
 
     void init_lorem_ipsum ();
+
+    void init_alphabet ();
 };
 
 template <typename Lz>
 EncodeDecodeTest<Lz>::EncodeDecodeTest () {
     init_single_char();
     init_lorem_ipsum();
+    init_alphabet();
 }
 
 template <typename Lz>
@@ -49,6 +53,16 @@ void EncodeDecodeTest<Lz>::init_lorem_ipsum () {
     );
 }
 
+template <typename Lz>
+void EncodeDecodeTest<Lz>::init_alphabet () {
+    BufferCharWriter writer(alphabet);
+    for (int i = 0; i < 15; ++i) {
+        for (int a = 0; a < CHAR_CNT; ++a)
+            writer.put(a);
+    }
+    cout << alphabet.size() << endl;
+}
+
 typedef testing::Types<
     Lz78<Smru>,
     Lzw<Smru>,
@@ -69,4 +83,9 @@ TYPED_TEST (EncodeDecodeTest, SingleChar) {
 TYPED_TEST (EncodeDecodeTest, LoremIpsum) {
     TypeParam lz(10);
     ASSERT_EQ(this->lorem_ipsum, lz.decode(lz.encode(this->lorem_ipsum)));
+}
+
+TYPED_TEST (EncodeDecodeTest, Alphabet) {
+    TypeParam lz(40);
+    ASSERT_EQ(this->alphabet, lz.decode(lz.encode(this->alphabet)));
 }

@@ -22,6 +22,9 @@ public:
 
     // Implements `Lz::decode(Buffer const&) const`.
     virtual Buffer decode(Buffer const& output) const;
+
+    // Implements `Lz::codeword_bits () const`.
+    virtual int codeword_bits () const;
 };
 
 template <typename Dict>
@@ -107,6 +110,11 @@ Buffer Lzw<Dict>::decode (Buffer const& output) const {
     }
 
     return input;
+}
+
+template <typename Dict>
+int Lzw<Dict>::codeword_bits () const {
+    return m_codeword_no_length;
 }
 
 #endif // LZW_H

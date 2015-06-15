@@ -22,6 +22,9 @@ public:
     // a sequence of chars. This is an iverse operation to `encode()`.
     virtual Buffer decode (Buffer const& output) const = 0;
 
+    // Return the size of a single codeword in bits.
+    virtual int codeword_bits () const = 0;
+
 protected:
     // TODO: Naming
     int const m_dictionary_limit;

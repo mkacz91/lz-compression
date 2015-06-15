@@ -17,7 +17,7 @@ Buffer Huffman::encode (Buffer const& input) {
     std::vector<int> weights(CHAR_CNT, 0);
     BufferCharReader wreader(input);
     for (int i = 0; i < char_cnt; ++i)
-        ++weights[wreader.get()];
+        ++weights[(unsigned char)wreader.get()];
     Node const* root = make_tree(weights);
 
     // The weights have to be stored for decoding.
@@ -60,7 +60,7 @@ Buffer Huffman::encode (Buffer const& input) {
     // Now we can smooth sail and output the codes.
     BufferCharReader reader(input);
     for (int i = 0; i < char_cnt; ++i) {
-        auto cl = codes[reader.get()];
+        auto cl = codes[(unsigned char)reader.get()];
         writer.put(cl.first, cl.second);
     }
 

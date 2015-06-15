@@ -54,3 +54,22 @@ add_executable(lzc_test ${LZC_TEST_HEADERS} ${LZC_TEST_SOURCES})
 set_property(TARGET lzc_test PROPERTY CXX_STANDARD 11)
 set_property(TARGET lzc_test PROPERTY CXX_STANDARD_REQUIRED ON)
 target_link_libraries(lzc_test pthread gtest lzc)
+
+
+
+set(LZC_BENCHMARK_HEADERS
+  benchmark/benchmark.h
+  benchmark/input_provider.h
+  benchmark/prefix.h
+)
+
+set(LZC_BENCHMARK_SOURCES
+  benchmark/benchmark.cpp
+  benchmark/input_provider.cpp
+  benchmark/main.cpp
+)
+
+add_executable(lzc_benchmark ${LZC_BENCHMARK_HEADERS} ${LZC_BENCHMARK_SOURCES})
+set_property(TARGET lzc_benchmark PROPERTY CXX_STANDARD 11)
+set_property(TARGET lzc_benchmark PROPERTY CXX_STANDARD_REQUIRED ON)
+target_link_libraries(lzc_benchmark lzc)
