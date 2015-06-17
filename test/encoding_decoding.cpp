@@ -60,7 +60,6 @@ void EncodeDecodeTest<Lz>::init_alphabet () {
         for (int a = 0; a < CHAR_CNT; ++a)
             writer.put(a);
     }
-    cout << alphabet.size() << endl;
 }
 
 typedef testing::Types<

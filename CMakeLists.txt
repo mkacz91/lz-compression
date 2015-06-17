@@ -65,8 +65,11 @@ set(LZC_BENCHMARK_HEADERS
 
 set(LZC_BENCHMARK_SOURCES
   benchmark/benchmark.cpp
+  benchmark/dict_size.cpp
   benchmark/input_provider.cpp
   benchmark/main.cpp
+  benchmark/time.cpp
+  benchmark/incremental.cpp
 )
 
 add_executable(lzc_benchmark ${LZC_BENCHMARK_HEADERS} ${LZC_BENCHMARK_SOURCES})
