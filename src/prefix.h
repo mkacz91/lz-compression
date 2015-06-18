@@ -7,6 +7,7 @@
 using std::cin;
 using std::cout;
 using std::endl;
+using std::flush;
 
 #include <string>
 using std::string;
@@ -32,6 +33,11 @@ using std::equal;
 using std::swap;
 using std::pair;
 using std::make_pair;
+
+#include <chrono>
+using std::chrono::milliseconds;
+using std::chrono::system_clock;
+using std::chrono::duration_cast;
 
 #define UNUSED(var) (void)(var)
 

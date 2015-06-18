@@ -15,6 +15,8 @@ public:
     // Constructs a new LZ encoder/decoder with a dictionary of given limit.
     Lz (int dictionary_limit);
 
+    virtual ~Lz ();
+
     // Encode the `input` buffer interpreted as sequence of chars.
     virtual Buffer encode (Buffer const& input) const = 0;
 
@@ -40,6 +42,10 @@ inline Lz::Lz (int dictionary_limit) :
     )
 {
     /* Do nothing */
+}
+
+inline Lz::~Lz () {
+    /* Do nothing. */
 }
 
 #endif // LZ_H

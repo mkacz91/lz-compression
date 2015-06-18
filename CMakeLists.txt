@@ -57,6 +57,13 @@ target_link_libraries(lzc_test pthread gtest lzc)
 
 
 
+add_executable(encode src/encode.cpp)
+set_property(TARGET encode PROPERTY CXX_STANDARD 11)
+set_property(TARGET encode PROPERTY CXX_STANDARD_REQUIRED ON)
+target_link_libraries(encode lzc)
+
+
+
 set(LZC_BENCHMARK_HEADERS
   benchmark/benchmark.h
   benchmark/input_provider.h
