@@ -79,4 +79,9 @@ inline T ceil_div (T a, T b) {
     return a == c * b ? c : c + 1;
 }
 
+inline word char_to_word (char a) {
+    // This is some evil hacking. I regret everything!
+    return *reinterpret_cast<unsigned char*>(&a);
+}
+
 #endif // PREFIX_H

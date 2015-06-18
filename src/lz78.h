@@ -49,7 +49,7 @@ Buffer Lz78<DictPair>::encode (Buffer const& input) const {
             ++ahead;
             if (match.is_maximal()) {
                 writer.put(match.codeword_no, m_codeword_no_length);
-                writer.put((unsigned char)match.extending_char, CHAR_BITS);
+                writer.put(char_to_word(match.extending_char), CHAR_BITS);
                 dict.put_back(ahead - match.length - 1);
                 ahead = 0;
             }

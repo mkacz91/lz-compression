@@ -17,7 +17,7 @@ Buffer Huffman::encode (Buffer const& input) {
     std::vector<int> weights(CHAR_CNT, 0);
     BufferCharReader wreader(input);
     for (int i = 0; i < char_cnt; ++i)
-        ++weights[(unsigned char)wreader.get()];
+        ++weights[char_to_word(wreader.get())];
     Node const* root = make_tree(weights);
 
     // The weights have to be stored for decoding.
@@ -34,7 +34,7 @@ Buffer Huffman::encode (Buffer const& input) {
     // along with their intermediate codes, i.e., paths to those nodes. The
     // final result is a code for each char represented as `(word, length)`
     // meaning that the `length` least significant bits of `word` is the code.
-    
+
     std::queue<pair<Node const*, word>> queue;
     std::queue<pair<Node const*, word>> next_queue;
     std::vector<pair<word, int>> codes(CHAR_CNT);
@@ -60,7 +60,7 @@ Buffer Huffman::encode (Buffer const& input) {
     // Now we can smooth sail and output the codes.
     BufferCharReader reader(input);
     for (int i = 0; i < char_cnt; ++i) {
-        auto cl = codes[(unsigned char)reader.get()];
+        auto cl = codes[char_to_word(reader.get())];
         writer.put(cl.first, cl.second);
     }
 
@@ -82,7 +82,7 @@ Buffer Huffman::decode (Buffer const& output) {
     // Remember that the last word is stored explicitly.
     int remaining_bits = reader.get(INT_BITS);
     word last_word = reader.get(WORD_BITS);
-    
+
     // Now the tree can be used as an automaton.
     Node const* node = root;
     while (!reader.eob()) {
