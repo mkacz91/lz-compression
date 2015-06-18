@@ -65,9 +65,8 @@ private:
     // being the edge label.
     ChildMap m_children;
 
-    // Position of this node within the parent's children map. Undefined for
-    // root nodes.
-    iterator m_children_pos;
+    // Label of the edge along which this node is linked to its parent
+    char m_link_char;
 };
 
 template <typename T>
@@ -76,7 +75,7 @@ inline WordTreeNode<T>::WordTreeNode (Args const&... args) :
     tag(args...),
     m_parent(nullptr)
 {
-    /* Do nothing. */
+    assert(this->is_root());
 }
 
 template <typename T>
@@ -106,21 +105,22 @@ inline void WordTreeNode<T>::link_child (char a, WordTreeNode* node) {
     assert(insert.second);
     node->unlink();
     node->m_parent = this;
-    node->m_children_pos = insert.first;
+    node->m_link_char = a;
 }
 
 template <typename T>
 inline void WordTreeNode<T>::unlink () {
-    if (m_parent != nullptr) {
-        m_parent->m_children.erase(m_children_pos);
+    if (!this->is_root()) {
+        assert(m_parent->m_children.count(m_link_char) == 1);
+        m_parent->m_children.erase(m_link_char);
         m_parent = nullptr;
     }
 }
 
 template <typename T>
 inline char WordTreeNode<T>::link_char () const {
-    assert(m_parent != nullptr);
-    return m_children_pos->first;
+    assert(!this->is_root());
+    return m_link_char;
 }
 
 template <typename T>
